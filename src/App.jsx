@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useRef, useState } from 'react'
+import React, { useEffect, useCallback, useRef, useState, useMemo } from 'react'
 import { useStore } from './store/useStore'
 import { usePlayer } from './hooks/usePlayer'
 import { useSearch } from './hooks/useSearch'
@@ -11,7 +11,11 @@ import FocusMode from './components/FocusMode'
 import EmptyState from './components/EmptyState'
 import QueuePanel from './components/QueuePanel'
 import StatsView from './components/StatsView'
+import SessionLog from './components/SessionLog'
+import ChangelogView from './components/ChangelogView'
+import KeymapView from './components/KeymapView'
 import ResizeDivider, { usePanelWidth } from './components/ResizeDivider'
+import { useBpmDetect } from './hooks/useBpmDetect'
 import './styles/layout.css'
 
 export default function App() {
@@ -33,6 +37,7 @@ export default function App() {
     shuffleOn, setShuffleOn,
     activeView, setActiveView,
     playHistory,
+    keymap, setKeymap,
   } = store
 
   const [currentPlaylist, setCurrentPlaylist] = useState(null)
@@ -40,6 +45,10 @@ export default function App() {
   const [playlists, setPlaylists] = useState([])
   const [queueVisible, setQueueVisible] = useState(true)
   const [newTrackFlash, setNewTrackFlash] = useState(null)
+  const [analyser, setAnalyser] = useState(null)
+  const [crates, setCrates] = useState([])
+  const [currentCrate, setCurrentCrate] = useState(null)
+  const [cratePaths, setCratePaths] = useState([])
 
   // ── Panel widths (Task 1) ─────────────────────────────────────────────────
   const [sidebarWidth, setSidebarWidth] = usePanelWidth('sidebar', 150, 90, 220)
@@ -53,11 +62,15 @@ export default function App() {
     ? tracks.filter(t => playlistPaths.includes(t.path))
     : []
 
+  const crateTracks = cratePaths.length ? tracks.filter(t => cratePaths.includes(t.path)) : []
+
   const displayTracks = currentPlaylist
     ? playlistTracks.current
-    : activeView === 'recent'
-      ? [...filteredTracks].sort((a, b) => b.addedAt - a.addedAt).slice(0, 50)
-      : filteredTracks
+    : currentCrate
+      ? crateTracks
+      : activeView === 'recent'
+        ? [...filteredTracks].sort((a, b) => b.addedAt - a.addedAt).slice(0, 50)
+        : filteredTracks
 
   // ── Initial scan ──────────────────────────────────────────────────────────
   useEffect(() => {
@@ -76,7 +89,7 @@ export default function App() {
         setScanning(false)
       }
       loadPlaylists()
-      // start chokidar watch (Task 4)
+      loadCrates()
       api.watchStart?.(dirs)
     }
     init()
@@ -105,24 +118,44 @@ export default function App() {
     setPlaylists(list)
   }, [])
 
+  const loadCrates = useCallback(async () => {
+    if (!api) return
+    const list = await api.crateList()
+    setCrates(list)
+  }, [])
+
+  const logAndAppend = useCallback((track) => {
+    logPlay(track)
+    api?.logAppend({ artist: track.artist, title: track.title })
+  }, [logPlay, api])
+
   // ── Keyboard shortcuts ────────────────────────────────────────────────────
   useEffect(() => {
     const handler = (e) => {
       const tag = document.activeElement?.tagName
-      if (tag === 'INPUT') return
-      if (e.code === 'Space') { e.preventDefault(); setIsPlaying(p => !p) }
-      if (e.code === 'ArrowRight' && !e.shiftKey) playNext()
-      if (e.code === 'ArrowLeft') playPrev()
-      if (e.code === 'ArrowUp') { e.preventDefault(); setVolume(Math.min(1, volume + 0.05)) }
-      if (e.code === 'ArrowDown') { e.preventDefault(); setVolume(Math.max(0, volume - 0.05)) }
-      if (e.code === 'KeyF' && !e.ctrlKey && !e.metaKey) enterFocus()
-      if (e.code === 'ArrowRight' && e.shiftKey) {
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return
+      const km = keymap
+      const code = e.shiftKey ? `Shift+${e.code}` : e.code
+      if (code === km.playPause || e.code === km.playPause) {
+        if (e.code === 'Space') e.preventDefault()
+        setIsPlaying(p => !p)
+      } else if (code === km.next) {
+        playNext()
+      } else if (code === km.prev) {
+        playPrev()
+      } else if (code === km.volumeUp) {
+        e.preventDefault(); setVolume(Math.min(1, volume + 0.05))
+      } else if (code === km.volumeDown) {
+        e.preventDefault(); setVolume(Math.max(0, volume - 0.05))
+      } else if (code === km.focusMode && !e.ctrlKey && !e.metaKey) {
+        enterFocus()
+      } else if (code === km.queueAdd) {
         if (currentTrack) setQueue(q => [...q, currentTrack])
       }
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [volume, currentTrack, shuffleOn]) // eslint-disable-line
+  }, [volume, currentTrack, shuffleOn, keymap]) // eslint-disable-line
 
   // ── Focus mode (Task 2) ───────────────────────────────────────────────────
   const enterFocus = useCallback(() => {
@@ -144,40 +177,44 @@ export default function App() {
     if (!list.length) return
     if (queue.length) {
       const [next, ...rest] = queue
-      setQueue(rest); setCurrentTrack(next); logPlay(next); return
+      setQueue(rest); setCurrentTrack(next); logAndAppend(next); return
     }
-    if (!currentTrack) { setCurrentTrack(list[0]); logPlay(list[0]); return }
+    if (!currentTrack) { setCurrentTrack(list[0]); logAndAppend(list[0]); return }
     if (shuffleOn) {
       const others = list.filter(t => t.id !== currentTrack.id)
       if (!others.length) return
       const diff = others.filter(t => t.artist !== currentTrack.artist)
       const pool = diff.length ? diff : others
       const next = pool[Math.floor(Math.random() * pool.length)]
-      setCurrentTrack(next); logPlay(next)
+      setCurrentTrack(next); logAndAppend(next)
     } else {
       const idx = list.findIndex(t => t.id === currentTrack.id)
       const next = list[(idx + 1) % list.length]
-      setCurrentTrack(next); logPlay(next)
+      setCurrentTrack(next); logAndAppend(next)
     }
-  }, [currentTrack, queue, shuffleOn, setCurrentTrack, setQueue, logPlay])
+  }, [currentTrack, queue, shuffleOn, setCurrentTrack, setQueue, logAndAppend])
 
   const playPrev = useCallback(() => {
     const list = activeList.current
     if (!list.length || !currentTrack) return
     const idx = list.findIndex(t => t.id === currentTrack.id)
-    setCurrentTrack(list[(idx - 1 + list.length) % list.length])
-    logPlay(list[(idx - 1 + list.length) % list.length])
-  }, [currentTrack, setCurrentTrack, logPlay])
+    const prev = list[(idx - 1 + list.length) % list.length]
+    setCurrentTrack(prev)
+    logAndAppend(prev)
+  }, [currentTrack, setCurrentTrack, logAndAppend])
 
   const playTrack = useCallback((track) => {
-    setCurrentTrack(track); logPlay(track); setIsPlaying(true)
-  }, [setCurrentTrack, logPlay, setIsPlaying])
+    setCurrentTrack(track); logAndAppend(track); setIsPlaying(true)
+  }, [setCurrentTrack, logAndAppend, setIsPlaying])
 
   const { seek } = usePlayer({
     currentTrack, isPlaying, volume,
     setIsPlaying, setProgress, setDuration,
     onTrackEnd: playNext,
+    onAnalyser: setAnalyser,
   })
+
+  const { detecting: bpmDetecting, detect: detectBpm } = useBpmDetect()
 
   // ── Rescan ────────────────────────────────────────────────────────────────
   const rescan = useCallback(async (dirs) => {
@@ -202,8 +239,8 @@ export default function App() {
     const resolved = tracks.filter(t => pl.paths.includes(t.path))
     if (!resolved.length) return
     setCurrentPlaylist(pl.name); setPlaylistPaths(pl.paths)
-    setCurrentTrack(resolved[0]); logPlay(resolved[0]); setIsPlaying(true)
-  }, [tracks, setCurrentTrack, logPlay, setIsPlaying])
+    setCurrentTrack(resolved[0]); logAndAppend(resolved[0]); setIsPlaying(true)
+  }, [tracks, setCurrentTrack, logAndAppend, setIsPlaying])
 
   const handleAddToPlaylist = useCallback(async (track, playlistName) => {
     if (!api) return
@@ -220,6 +257,29 @@ export default function App() {
     if (api) await api.tagsSave({ trackId, tags })
     setTracks(prev => prev.map(t => t.id === trackId ? { ...t, tags } : t))
   }, [api, setTracks])
+
+  // ── BPM save ──────────────────────────────────────────────────────────────
+  const handleBpmSave = useCallback(async (track, bpm) => {
+    if (api) await api.bpmSave({ trackId: track.id, bpm })
+    setTracks(prev => prev.map(t => t.id === track.id ? { ...t, bpm } : t))
+  }, [api, setTracks])
+
+  // ── Crates ────────────────────────────────────────────────────────────────
+  const handleCrateSelect = useCallback((name, paths) => {
+    setCurrentCrate(name); setCratePaths(paths || [])
+    setCurrentPlaylist(null); setPlaylistPaths([])
+    setActiveView('library'); setSearchQuery('')
+  }, [setActiveView, setSearchQuery])
+
+  const handleAddToCrate = useCallback(async (track, crateName) => {
+    if (!api) return
+    const list = await api.crateList()
+    const cr = list.find(c => c.name === crateName)
+    if (!cr || cr.paths.includes(track.path)) return
+    await api.crateSave({ name: crateName, paths: [...cr.paths, track.path] })
+    loadCrates()
+    if (currentCrate === crateName) setCratePaths(prev => [...prev, track.path])
+  }, [api, currentCrate, loadCrates])
 
   // ── Queue ─────────────────────────────────────────────────────────────────
   const removeFromQueue = useCallback((idx) => setQueue(q => q.filter((_, i) => i !== idx)), [setQueue])
@@ -263,19 +323,33 @@ export default function App() {
         <Sidebar
           style={{ width: sidebarWidth, minWidth: sidebarWidth }}
           activeView={activeView}
-          setActiveView={v => { setActiveView(v); setCurrentPlaylist(null); setPlaylistPaths([]) }}
+          setActiveView={v => {
+            setActiveView(v)
+            setCurrentPlaylist(null); setPlaylistPaths([])
+            setCurrentCrate(null); setCratePaths([])
+          }}
           currentPlaylist={currentPlaylist}
           onPlaylistSelect={handlePlaylistSelect}
           onPlaylistPlay={handlePlaylistPlay}
           tracks={tracks}
           onPlaylistsChange={loadPlaylists}
+          crates={crates}
+          currentCrate={currentCrate}
+          onCrateSelect={handleCrateSelect}
+          onCratesChange={loadCrates}
         />
 
         <ResizeDivider onDrag={dx => setSidebarWidth(w => w + dx)} />
 
         <div className="content-area">
-          {activeView === 'stats' && !currentPlaylist ? (
+          {activeView === 'stats' && !currentPlaylist && !currentCrate ? (
             <StatsView tracks={tracks} playHistory={playHistory} />
+          ) : activeView === 'log' ? (
+            <SessionLog api={api} />
+          ) : activeView === 'changelog' ? (
+            <ChangelogView api={api} />
+          ) : activeView === 'keys' ? (
+            <KeymapView keymap={keymap} setKeymap={setKeymap} />
           ) : tracks.length === 0 && !scanning ? (
             <EmptyState onScan={() => rescan()} />
           ) : (
@@ -288,6 +362,10 @@ export default function App() {
               onTagSave={handleTagSave}
               playlists={playlists}
               onAddToPlaylist={handleAddToPlaylist}
+              crates={crates}
+              onAddToCrate={handleAddToCrate}
+              onBpmDetect={(track) => detectBpm(track, (bpm) => bpm && handleBpmSave(track, bpm))}
+              bpmDetecting={bpmDetecting}
             />
           )}
         </div>
@@ -311,6 +389,7 @@ export default function App() {
         duration={duration}
         volume={volume}
         shuffleOn={shuffleOn}
+        analyser={analyser}
         onPlayPause={() => setIsPlaying(p => !p)}
         onNext={playNext}
         onPrev={playPrev}

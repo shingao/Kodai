@@ -14,7 +14,7 @@ function truncate(str, max) {
   return str.length > max ? str.slice(0, max - 1) + '…' : str
 }
 
-export default function TrackList({ tracks, currentTrack, isPlaying, onPlay, onAddToQueue, onTagSave, playlists, onAddToPlaylist }) {
+export default function TrackList({ tracks, currentTrack, isPlaying, onPlay, onAddToQueue, onTagSave, playlists, onAddToPlaylist, crates, onAddToCrate, onBpmDetect, bpmDetecting }) {
   const activeRef = useRef(null)
   const [editingTag, setEditingTag] = useState(null)
   const [ctxMenu, setCtxMenu] = useState(null)
@@ -36,6 +36,17 @@ export default function TrackList({ tracks, currentTrack, isPlaying, onPlay, onA
     setCtxMenu({ x: e.clientX, y: e.clientY, track })
   }
 
+  const handleDragStart = (e, track) => {
+    e.dataTransfer.setData('application/x-track', JSON.stringify({ id: track.id, path: track.path, title: track.title, artist: track.artist }))
+    e.dataTransfer.effectAllowed = 'copy'
+  }
+
+  const fmtBpm = (track) => {
+    if (bpmDetecting?.[track.id]) return '[...]'
+    if (track.bpm) return Math.round(track.bpm)
+    return '[~]'
+  }
+
   if (!tracks.length) {
     return (
       <div className="tracklist-empty">
@@ -51,6 +62,7 @@ export default function TrackList({ tracks, currentTrack, isPlaying, onPlay, onA
         <span className="col-title">TITLE</span>
         <span className="col-artist">ARTIST</span>
         <span className="col-album">ALBUM</span>
+        <span className="col-bpm">BPM</span>
         <span className="col-dur">DUR</span>
       </div>
       <div className="tracklist-body">
@@ -63,6 +75,8 @@ export default function TrackList({ tracks, currentTrack, isPlaying, onPlay, onA
               className={`track-row ${isActive ? 'active' : ''}`}
               onDoubleClick={() => onPlay(track)}
               onContextMenu={e => handleContext(e, track)}
+              draggable
+              onDragStart={e => handleDragStart(e, track)}
               title={`${track.artist} — ${track.title}\nRight-click for options`}
             >
               <span className="col-num">
@@ -95,6 +109,18 @@ export default function TrackList({ tracks, currentTrack, isPlaying, onPlay, onA
               </span>
               <span className="col-artist">{truncate(track.artist, 24)}</span>
               <span className="col-album">{truncate(track.album, 24)}</span>
+              <span
+                className={`col-bpm ${!track.bpm && !bpmDetecting?.[track.id] ? 'col-bpm-detect' : ''}`}
+                onClick={e => {
+                  if (!track.bpm && !bpmDetecting?.[track.id]) {
+                    e.stopPropagation()
+                    onBpmDetect?.(track)
+                  }
+                }}
+                title={track.bpm ? `BPM: ${Math.round(track.bpm)}` : 'Click to detect BPM'}
+              >
+                {fmtBpm(track)}
+              </span>
               <span className="col-dur">{fmtDur(track.duration)}</span>
             </div>
           )
@@ -117,17 +143,35 @@ export default function TrackList({ tracks, currentTrack, isPlaying, onPlay, onA
           <div className="ctx-item" onClick={() => { setEditingTag(ctxMenu.track.id); setCtxMenu(null) }}>
             # edit tags
           </div>
+          <div className="ctx-item" onClick={() => { onBpmDetect?.(ctxMenu.track); setCtxMenu(null) }}>
+            ~ detect BPM
+          </div>
           {playlists?.length > 0 && (
             <>
               <div className="ctx-divider" />
               <div className="ctx-sub-label">add to playlist</div>
-              {playlists.map(pl => (
+              {playlists.filter(pl => !pl.smart).map(pl => (
                 <div
                   key={pl.name}
                   className="ctx-item ctx-indent"
                   onClick={() => { onAddToPlaylist(ctxMenu.track, pl.name); setCtxMenu(null) }}
                 >
                   › {pl.name}
+                </div>
+              ))}
+            </>
+          )}
+          {crates?.length > 0 && (
+            <>
+              <div className="ctx-divider" />
+              <div className="ctx-sub-label">add to crate</div>
+              {crates.map(cr => (
+                <div
+                  key={cr.code}
+                  className="ctx-item ctx-indent"
+                  onClick={() => { onAddToCrate?.(ctxMenu.track, cr.name); setCtxMenu(null) }}
+                >
+                  › [{cr.code}] {cr.name}
                 </div>
               ))}
             </>

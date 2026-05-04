@@ -14,7 +14,7 @@ function volBars(vol) {
   return '█'.repeat(filled) + '░'.repeat(8 - filled)
 }
 
-export default function Player({ track, isPlaying, progress, duration, volume, shuffleOn, onPlayPause, onNext, onPrev, onSeek, onVolume, onShuffle }) {
+export default function Player({ track, isPlaying, progress, duration, volume, shuffleOn, onPlayPause, onNext, onPrev, onSeek, onVolume, onShuffle, analyser }) {
   return (
     <footer className="player">
       <div className="player-info">
@@ -36,7 +36,7 @@ export default function Player({ track, isPlaying, progress, duration, volume, s
       <div className="player-center">
         <div className="waveform-row">
           <span className="time-label">{fmtTime(progress)}</span>
-          <Waveform progress={progress} duration={duration} onSeek={onSeek} />
+          <Waveform progress={progress} duration={duration} onSeek={onSeek} analyser={analyser} isPlaying={isPlaying} />
           <span className="time-label">{fmtTime(duration)}</span>
         </div>
         <div className="controls-row">

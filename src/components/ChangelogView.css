@@ -1,0 +1,74 @@
+.changelog-view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.cl-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.cl-title {
+  font-size: 10px;
+  color: var(--text-dimmer);
+  letter-spacing: 0.12em;
+}
+
+.cl-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.cl-btn {
+  color: var(--text-dimmer);
+  font-size: 12px;
+  padding: 1px 4px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+}
+.cl-btn:hover {
+  color: var(--text);
+  border-color: var(--border-light);
+}
+
+.cl-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+
+.cl-empty {
+  padding: 12px 14px;
+  font-size: 11px;
+  color: var(--text-dimmer);
+  font-style: italic;
+}
+
+.cl-lines {
+  display: flex;
+  flex-direction: column;
+}
+
+.cl-line {
+  padding: 2px 14px;
+  font-size: 11px;
+  color: var(--text-dim);
+  white-space: pre;
+  font-family: var(--font);
+  line-height: 1.6;
+}
+
+.cl-line.cl-added {
+  color: var(--text-dim);
+}
+
+.cl-line.cl-removed {
+  color: var(--text-dimmer);
+  opacity: 0.6;
+}

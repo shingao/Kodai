@@ -106,7 +106,7 @@ ipcMain.handle('scan-dirs', async (event, dirs) => {
             album: common.album || 'Unknown Album',
             year: common.year || null,
             duration: format.duration || 0,
-            bpm: common.bpm || null,
+            bpm: data.bpm?.[id] || common.bpm || null,
             addedAt: stat.mtimeMs,
             playCount: 0,
             tags: data.tags?.[id] || [],
@@ -298,7 +298,134 @@ ipcMain.handle('tags-load-all', () => {
   return loadData().tags || {}
 })
 
-// ── IPC: chokidar watch (Task 4) ───────────────────────────────────────────
+// ── IPC: BPM save ─────────────────────────────────────────────────────────
+ipcMain.handle('bpm-save', (_, { trackId, bpm }) => {
+  const data = loadData()
+  if (!data.bpm) data.bpm = {}
+  data.bpm[trackId] = bpm
+  saveData(data)
+  return true
+})
+
+// ── IPC: crates ────────────────────────────────────────────────────────────
+function cratesDir() {
+  const dir = path.join(os.homedir(), 'Music', 'SONIC_OS', 'crates')
+  fs.mkdirSync(dir, { recursive: true })
+  return dir
+}
+
+ipcMain.handle('crate-list', () => {
+  const dir = cratesDir()
+  return fs.readdirSync(dir)
+    .filter(f => f.endsWith('.json'))
+    .map(f => {
+      try {
+        return JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8'))
+      } catch { return null }
+    })
+    .filter(Boolean)
+})
+
+ipcMain.handle('crate-create', (_, { name, code }) => {
+  const data = { name, code, paths: [], createdAt: Date.now() }
+  fs.writeFileSync(path.join(cratesDir(), `${code}.json`), JSON.stringify(data, null, 2))
+  return data
+})
+
+ipcMain.handle('crate-rename', (_, { code, newName }) => {
+  const file = path.join(cratesDir(), `${code}.json`)
+  const data = JSON.parse(fs.readFileSync(file, 'utf8'))
+  data.name = newName
+  fs.writeFileSync(file, JSON.stringify(data, null, 2))
+  return true
+})
+
+ipcMain.handle('crate-delete', (_, code) => {
+  const file = path.join(cratesDir(), `${code}.json`)
+  if (fs.existsSync(file)) fs.unlinkSync(file)
+  return true
+})
+
+ipcMain.handle('crate-save', (_, { name, code, paths }) => {
+  const file = path.join(cratesDir(), `${code}.json`)
+  const data = fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : { name, code, createdAt: Date.now() }
+  data.paths = paths
+  fs.writeFileSync(file, JSON.stringify(data, null, 2))
+  return true
+})
+
+ipcMain.handle('crate-export', async (_, { name, paths }) => {
+  const result = await dialog.showSaveDialog(mainWindow, {
+    defaultPath: `${name}.m3u`,
+    filters: [{ name: 'M3U Playlist', extensions: ['m3u'] }],
+  })
+  if (!result.filePath) return false
+  fs.writeFileSync(result.filePath, ['#EXTM3U', ...paths].join('\n') + '\n')
+  return true
+})
+
+// ── IPC: session log ───────────────────────────────────────────────────────
+function sessionLogFile() {
+  const dir = path.join(os.homedir(), '.config', 'sonic-os')
+  fs.mkdirSync(dir, { recursive: true })
+  return path.join(dir, 'sessions.log')
+}
+
+let lastLogTime = 0
+ipcMain.handle('log-append', (_, { artist, title }) => {
+  const now = Date.now()
+  const file = sessionLogFile()
+  const ts = new Date(now).toISOString().replace('T', ' ').slice(0, 19)
+  let line = `[${ts}] ${artist} — ${title}\n`
+  if (now - lastLogTime > 30 * 60 * 1000 && lastLogTime > 0) {
+    line = `\n--- session break ---\n\n` + line
+  }
+  lastLogTime = now
+  fs.appendFileSync(file, line)
+  return true
+})
+
+ipcMain.handle('log-read', () => {
+  try { return fs.readFileSync(sessionLogFile(), 'utf8') } catch { return '' }
+})
+
+ipcMain.handle('log-export', async () => {
+  const result = await dialog.showSaveDialog(mainWindow, {
+    defaultPath: 'sessions.log',
+    filters: [{ name: 'Log File', extensions: ['log', 'txt'] }],
+  })
+  if (!result.filePath) return false
+  fs.copyFileSync(sessionLogFile(), result.filePath)
+  return true
+})
+
+ipcMain.handle('log-clear', () => {
+  fs.writeFileSync(sessionLogFile(), '')
+  return true
+})
+
+// ── IPC: changelog ─────────────────────────────────────────────────────────
+function changelogFile() {
+  const dir = path.join(os.homedir(), '.config', 'sonic-os')
+  fs.mkdirSync(dir, { recursive: true })
+  return path.join(dir, 'changelog.log')
+}
+
+function appendChangelog(prefix, filePath) {
+  const ts = new Date().toISOString().replace('T', ' ').slice(0, 19)
+  fs.appendFileSync(changelogFile(), `${prefix} [${ts}] ${filePath}\n`)
+}
+
+ipcMain.handle('changelog-read', () => {
+  try { return fs.readFileSync(changelogFile(), 'utf8') } catch { return '' }
+})
+
+ipcMain.handle('changelog-clear', () => {
+  fs.writeFileSync(changelogFile(), '')
+  return true
+})
+
+// ── IPC: chokidar watch ────────────────────────────────────────────────────
 let watcher = null
 
 ipcMain.handle('watch-start', async (_, dirs) => {
@@ -331,17 +458,19 @@ ipcMain.handle('watch-start', async (_, dirs) => {
         album: common.album || 'Unknown Album',
         year: common.year || null,
         duration: format.duration || 0,
-        bpm: common.bpm || null,
+        bpm: data.bpm?.[id] || common.bpm || null,
         addedAt: stat.mtimeMs,
         playCount: 0,
         tags: data.tags?.[id] || [],
       }
+      appendChangelog('+', filePath)
       mainWindow?.webContents.send('track-added', track)
     } catch { /* skip */ }
   })
 
   watcher.on('unlink', (filePath) => {
     if (!EXTENSIONS.has(path.extname(filePath).toLowerCase())) return
+    appendChangelog('-', filePath)
     mainWindow?.webContents.send('track-removed', filePath)
   })
 })

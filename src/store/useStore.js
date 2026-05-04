@@ -1,6 +1,16 @@
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback } from 'react'
 
 const STORAGE_KEY = 'sonic_os_state'
+
+export const DEFAULT_KEYMAP = {
+  playPause: 'Space',
+  next: 'ArrowRight',
+  prev: 'ArrowLeft',
+  volumeUp: 'ArrowUp',
+  volumeDown: 'ArrowDown',
+  focusMode: 'KeyF',
+  queueAdd: 'Shift+ArrowRight',
+}
 
 function loadPersisted() {
   try {
@@ -36,6 +46,7 @@ export function useStore() {
   const [queue, setQueue] = useState([])
   const [shuffleOn, setShuffleOn] = useState(saved.shuffleOn ?? false)
   const [activeView, setActiveView] = useState('library')
+  const [keymap, setKeymapState] = useState(saved.keymap ?? DEFAULT_KEYMAP)
 
   const setCurrentTrack = useCallback((track) => {
     setCurrentTrackState(track)
@@ -78,6 +89,11 @@ export function useStore() {
     persist({ shuffleOn: v })
   }, [])
 
+  const setKeymap = useCallback((km) => {
+    setKeymapState(km)
+    persist({ keymap: km })
+  }, [])
+
   return {
     tracks, setTracks,
     currentTrack, setCurrentTrack,
@@ -94,5 +110,6 @@ export function useStore() {
     queue, setQueue,
     shuffleOn, setShuffleOn: persistShuffle,
     activeView, setActiveView,
+    keymap, setKeymap,
   }
 }

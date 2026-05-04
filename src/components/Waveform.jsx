@@ -6,14 +6,17 @@ const BAR_GAP = 1
 const BAR_STEP = BAR_WIDTH + BAR_GAP
 const MAX_HEIGHT = 28
 
-export default function Waveform({ progress, duration, onSeek }) {
+export default function Waveform({ progress, duration, onSeek, analyser, isPlaying }) {
   const canvasRef = useRef(null)
   const barsRef = useRef(null)
-  const animRef = useRef(null)
-  const analyserRef = useRef(null)
-  const sourceRef = useRef(null)
+  const liveRafRef = useRef(null)
+  const progressRef = useRef(progress)
+  const durationRef = useRef(duration)
 
-  // Generate static noise bars on mount (no audio context needed for display)
+  useEffect(() => { progressRef.current = progress }, [progress])
+  useEffect(() => { durationRef.current = duration }, [duration])
+
+  // Generate static noise bars on mount
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
@@ -22,7 +25,6 @@ export default function Waveform({ progress, duration, onSeek }) {
     canvas.height = MAX_HEIGHT + 4
 
     const count = Math.floor(W / BAR_STEP)
-    // Pseudo-random waveform that looks organic
     const bars = []
     let v = 0.5
     for (let i = 0; i < count; i++) {
@@ -31,16 +33,39 @@ export default function Waveform({ progress, duration, onSeek }) {
       bars.push(v)
     }
     barsRef.current = bars
-    drawBars(canvas, bars, progress, duration)
+    drawBars(canvas, bars, progress, duration, null)
   }, []) // eslint-disable-line
 
+  // Static redraw when not in live mode
   useEffect(() => {
+    if (analyser && isPlaying) return
     const canvas = canvasRef.current
     if (!canvas || !barsRef.current) return
-    drawBars(canvas, barsRef.current, progress, duration)
-  }, [progress, duration])
+    drawBars(canvas, barsRef.current, progress, duration, null)
+  }, [progress, duration, analyser, isPlaying])
 
-  function drawBars(canvas, bars, prog, dur) {
+  // Live rAF loop when analyser is active and playing
+  useEffect(() => {
+    if (liveRafRef.current) {
+      cancelAnimationFrame(liveRafRef.current)
+      liveRafRef.current = null
+    }
+    if (!analyser || !isPlaying) return
+    const canvas = canvasRef.current
+    const dataArray = new Uint8Array(analyser.frequencyBinCount)
+    const tick = () => {
+      analyser.getByteFrequencyData(dataArray)
+      drawBars(canvas, barsRef.current, progressRef.current, durationRef.current, dataArray)
+      liveRafRef.current = requestAnimationFrame(tick)
+    }
+    liveRafRef.current = requestAnimationFrame(tick)
+    return () => {
+      if (liveRafRef.current) cancelAnimationFrame(liveRafRef.current)
+    }
+  }, [analyser, isPlaying])
+
+  function drawBars(canvas, bars, prog, dur, liveData) {
+    if (!canvas || !bars) return
     const ctx = canvas.getContext('2d')
     const W = canvas.width
     const H = canvas.height
@@ -50,9 +75,15 @@ export default function Waveform({ progress, duration, onSeek }) {
 
     bars.forEach((h, i) => {
       const x = i * BAR_STEP
-      const barH = Math.max(2, h * MAX_HEIGHT)
-      const y = (H - barH) / 2
       const isPast = i / bars.length <= pct
+      let barH
+      if (isPast && liveData) {
+        const freqIdx = Math.floor((i / bars.length) * liveData.length)
+        barH = Math.max(2, (liveData[freqIdx] / 255) * MAX_HEIGHT)
+      } else {
+        barH = Math.max(2, h * MAX_HEIGHT)
+      }
+      const y = (H - barH) / 2
       ctx.fillStyle = isPast ? '#aaaaaa' : '#2e2e2e'
       ctx.fillRect(x, y, BAR_WIDTH, barH)
     })

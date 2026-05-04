@@ -1,0 +1,146 @@
+.crate-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: 4px;
+}
+
+.cr-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 12px;
+}
+
+.cr-title {
+  font-size: 10px;
+  color: var(--text-dimmer);
+  letter-spacing: 0.1em;
+}
+
+.cr-btn {
+  color: var(--text-dimmer);
+  font-size: 12px;
+  padding: 0 3px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+}
+.cr-btn:hover {
+  color: var(--text);
+  border-color: var(--border-light);
+}
+
+.cr-input-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  background: var(--bg-selected);
+}
+
+.cr-prompt {
+  color: var(--text-dimmer);
+  font-size: 11px;
+}
+
+.cr-input {
+  flex: 1;
+  font-size: 11px;
+  color: var(--text);
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: var(--font);
+  caret-color: var(--text);
+}
+
+.cr-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.cr-empty {
+  padding: 4px 14px;
+  font-size: 10px;
+  color: var(--text-dimmer);
+  font-style: italic;
+}
+
+.cr-item {
+  display: flex;
+  align-items: center;
+  padding: 4px 8px 4px 12px;
+  cursor: pointer;
+  font-size: 11px;
+  color: var(--text-dim);
+  gap: 2px;
+  position: relative;
+}
+
+.cr-item:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+
+.cr-item.active {
+  background: var(--bg-selected);
+  color: var(--text);
+}
+
+.cr-item.drag-over {
+  background: var(--bg-selected);
+  outline: 1px dashed var(--border-light);
+}
+
+.cr-indicator {
+  font-size: 9px;
+  color: var(--text-dimmer);
+  flex-shrink: 0;
+  width: 14px;
+}
+
+.cr-code {
+  font-size: 9px;
+  color: var(--text-dimmer);
+  flex-shrink: 0;
+  margin-right: 3px;
+  letter-spacing: 0.05em;
+}
+
+.cr-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cr-count {
+  font-size: 10px;
+  color: var(--text-dimmer);
+  flex-shrink: 0;
+  margin-left: 4px;
+}
+
+.cr-item-actions {
+  display: none;
+  gap: 2px;
+  margin-left: 4px;
+  flex-shrink: 0;
+}
+
+.cr-item:hover .cr-item-actions {
+  display: flex;
+}
+
+.cr-item-actions button {
+  color: var(--text-dimmer);
+  font-size: 10px;
+  padding: 1px 3px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+}
+.cr-item-actions button:hover {
+  color: var(--text);
+  border-color: var(--border-light);
+}

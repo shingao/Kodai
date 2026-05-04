@@ -114,6 +114,25 @@
   font-size: 11px;
 }
 
+.col-bpm {
+  width: 40px;
+  min-width: 40px;
+  text-align: right;
+  color: var(--text-dimmer);
+  font-size: 11px;
+  flex-shrink: 0;
+}
+
+.col-bpm-detect {
+  cursor: pointer;
+  color: var(--text-dimmer);
+  opacity: 0.5;
+}
+.col-bpm-detect:hover {
+  color: var(--text);
+  opacity: 1;
+}
+
 .col-dur {
   width: 44px;
   min-width: 44px;

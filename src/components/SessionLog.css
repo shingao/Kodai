@@ -1,0 +1,72 @@
+.session-log {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.log-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.log-title {
+  font-size: 10px;
+  color: var(--text-dimmer);
+  letter-spacing: 0.12em;
+}
+
+.log-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.log-btn {
+  color: var(--text-dimmer);
+  font-size: 12px;
+  padding: 1px 4px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+}
+.log-btn:hover {
+  color: var(--text);
+  border-color: var(--border-light);
+}
+
+.log-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+
+.log-empty {
+  padding: 12px 14px;
+  font-size: 11px;
+  color: var(--text-dimmer);
+  font-style: italic;
+}
+
+.log-lines {
+  display: flex;
+  flex-direction: column;
+}
+
+.log-line {
+  padding: 2px 14px;
+  font-size: 11px;
+  color: var(--text-dim);
+  white-space: pre;
+  font-family: var(--font);
+  line-height: 1.6;
+}
+
+.log-line.log-sep {
+  color: var(--text-dimmer);
+  padding: 6px 14px;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+}

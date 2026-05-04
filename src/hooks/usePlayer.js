@@ -1,10 +1,13 @@
 import { useEffect, useRef, useCallback } from 'react'
 import { Howl } from 'howler'
 
-export function usePlayer({ currentTrack, isPlaying, volume, setIsPlaying, setProgress, setDuration, onTrackEnd }) {
+export function usePlayer({ currentTrack, isPlaying, volume, setIsPlaying, setProgress, setDuration, onTrackEnd, onAnalyser }) {
   const howlRef = useRef(null)
   const rafRef = useRef(null)
   const trackRef = useRef(null)
+  const ctxRef = useRef(null)
+  const analyserRef = useRef(null)
+  const sourceRef = useRef(null)
 
   const stopRAF = () => {
     if (rafRef.current) {
@@ -25,6 +28,31 @@ export function usePlayer({ currentTrack, isPlaying, volume, setIsPlaying, setPr
     rafRef.current = requestAnimationFrame(tick)
   }, [setProgress])
 
+  const setupAnalyser = useCallback((howl) => {
+    const audioNode = howl._sounds?.[0]?._node
+    if (!audioNode) return
+    try {
+      if (!ctxRef.current) {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)()
+        const analyser = ctx.createAnalyser()
+        analyser.fftSize = 128
+        analyser.connect(ctx.destination)
+        ctxRef.current = ctx
+        analyserRef.current = analyser
+      }
+      if (sourceRef.current) {
+        try { sourceRef.current.disconnect() } catch {}
+        sourceRef.current = null
+      }
+      sourceRef.current = ctxRef.current.createMediaElementSource(audioNode)
+      sourceRef.current.connect(analyserRef.current)
+      if (ctxRef.current.state === 'suspended') ctxRef.current.resume()
+      onAnalyser?.(analyserRef.current)
+    } catch (e) {
+      console.warn('AudioContext setup:', e)
+    }
+  }, [onAnalyser])
+
   // Load new track
   useEffect(() => {
     if (!currentTrack) return
@@ -37,7 +65,6 @@ export function usePlayer({ currentTrack, isPlaying, volume, setIsPlaying, setPr
       howlRef.current.unload()
     }
 
-    // Electron serves local files via webSecurity:false, use file:// path
     const src = currentTrack.path.startsWith('/')
       ? `localfile://${currentTrack.path}`
       : currentTrack.path
@@ -48,10 +75,12 @@ export function usePlayer({ currentTrack, isPlaying, volume, setIsPlaying, setPr
       volume,
       onload() {
         setDuration(howl.duration())
+        setupAnalyser(howl)
       },
       onplay() {
         setIsPlaying(true)
         startRAF()
+        if (ctxRef.current?.state === 'suspended') ctxRef.current.resume()
       },
       onpause() {
         setIsPlaying(false)

@@ -24,6 +24,23 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // tags
   tagsSave: (args) => ipcRenderer.invoke('tags-save', args),
   tagsLoadAll: () => ipcRenderer.invoke('tags-load-all'),
+  // bpm
+  bpmSave: (args) => ipcRenderer.invoke('bpm-save', args),
+  // crates
+  crateList: () => ipcRenderer.invoke('crate-list'),
+  crateCreate: (args) => ipcRenderer.invoke('crate-create', args),
+  crateRename: (args) => ipcRenderer.invoke('crate-rename', args),
+  crateDelete: (code) => ipcRenderer.invoke('crate-delete', code),
+  crateSave: (args) => ipcRenderer.invoke('crate-save', args),
+  crateExport: (args) => ipcRenderer.invoke('crate-export', args),
+  // session log
+  logAppend: (args) => ipcRenderer.invoke('log-append', args),
+  logRead: () => ipcRenderer.invoke('log-read'),
+  logExport: () => ipcRenderer.invoke('log-export'),
+  logClear: () => ipcRenderer.invoke('log-clear'),
+  // changelog
+  changelogRead: () => ipcRenderer.invoke('changelog-read'),
+  changelogClear: () => ipcRenderer.invoke('changelog-clear'),
   // chokidar watch
   watchStart: (dirs) => ipcRenderer.invoke('watch-start', dirs),
   onTrackAdded: (cb) => {
