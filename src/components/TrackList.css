@@ -1,0 +1,124 @@
+.tracklist {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.tracklist-empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dimmer);
+  font-size: 12px;
+}
+
+.tracklist-header {
+  display: flex;
+  align-items: center;
+  padding: 5px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-dimmer);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.tracklist-body {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.track-row {
+  display: flex;
+  align-items: center;
+  padding: 5px 12px;
+  gap: 8px;
+  border-bottom: 1px solid transparent;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.track-row:hover {
+  background: var(--bg-hover);
+  border-bottom-color: var(--border);
+}
+
+.track-row.active {
+  background: var(--bg-selected);
+  border-bottom-color: var(--border-light);
+}
+
+.col-num {
+  width: 28px;
+  min-width: 28px;
+  color: var(--text-dimmer);
+  font-size: 11px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.track-row.active .col-num {
+  color: var(--playing);
+}
+
+.playing-icon {
+  color: var(--playing);
+  font-size: 10px;
+}
+
+.track-num {
+  color: var(--text-dimmer);
+}
+
+.col-title {
+  flex: 2;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text);
+  font-size: 12px;
+}
+
+.track-row.active .col-title {
+  color: var(--playing);
+}
+
+.tags {
+  color: var(--text-dimmer);
+  font-size: 10px;
+  margin-right: 4px;
+}
+
+.col-artist {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-dim);
+  font-size: 11px;
+}
+
+.col-album {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-dimmer);
+  font-size: 11px;
+}
+
+.col-dur {
+  width: 44px;
+  min-width: 44px;
+  text-align: right;
+  color: var(--text-dimmer);
+  font-size: 11px;
+  flex-shrink: 0;
+}

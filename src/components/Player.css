@@ -1,0 +1,161 @@
+.player {
+  display: flex;
+  align-items: stretch;
+  gap: 16px;
+  padding: 8px 14px;
+  border-top: 1px solid var(--border);
+  background: var(--bg-elevated);
+  min-height: 80px;
+  flex-shrink: 0;
+}
+
+.player-info {
+  width: 220px;
+  min-width: 180px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  border-right: 1px solid var(--border);
+  padding-right: 14px;
+}
+
+.now-playing-label {
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: var(--text-dimmer);
+  text-transform: uppercase;
+}
+
+.now-playing-label.dim {
+  color: var(--text-dimmer);
+}
+
+.now-playing-track {
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.np-sep {
+  color: var(--text-dimmer);
+}
+
+.now-playing-title {
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: 0.02em;
+}
+
+.player-center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.waveform-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.time-label {
+  font-size: 11px;
+  color: var(--text-dim);
+  min-width: 36px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.time-label:last-child {
+  text-align: right;
+}
+
+.controls-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ctrl-btn {
+  color: var(--text-dim);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  padding: 3px 6px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  transition: all 0.1s;
+  white-space: nowrap;
+}
+
+.ctrl-btn:hover {
+  color: var(--text);
+  border-color: var(--border-light);
+}
+
+.play-btn {
+  font-size: 12px;
+  border-color: var(--border-light);
+  color: var(--text);
+  padding: 3px 10px;
+  min-width: 72px;
+  text-align: center;
+}
+
+.vol-control {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: 8px;
+}
+
+.vol-label {
+  font-size: 10px;
+  color: var(--text-dimmer);
+  letter-spacing: 0.1em;
+}
+
+.vol-bars {
+  color: var(--text-dim);
+  font-size: 10px;
+  letter-spacing: -1px;
+}
+
+.vol-btns {
+  display: flex;
+  gap: 2px;
+}
+
+.vol-btns button {
+  color: var(--text-dimmer);
+  font-size: 12px;
+  padding: 0 3px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+}
+.vol-btns button:hover {
+  color: var(--text);
+  border-color: var(--border-light);
+}
+
+.shuffle-btn {
+  font-size: 10px;
+  margin-left: auto;
+  color: var(--text-dimmer);
+  letter-spacing: 0.05em;
+}
+
+.shuffle-btn.on {
+  color: var(--accent);
+  border-color: var(--border-light);
+}

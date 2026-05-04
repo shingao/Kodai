@@ -1,0 +1,73 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  height: 36px;
+  min-height: 36px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+}
+
+.header-logo {
+  color: var(--text);
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  font-size: 12px;
+}
+
+.header-version {
+  color: var(--text-dimmer);
+}
+
+.header-meta {
+  color: var(--text-dim);
+}
+
+.header-meta.scanning {
+  color: var(--accent);
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0.4; }
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.hbtn {
+  color: var(--text-dimmer);
+  font-size: 11px;
+  padding: 2px 6px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  transition: color 0.15s, border-color 0.15s;
+  letter-spacing: 0.05em;
+}
+
+.hbtn:hover {
+  color: var(--text);
+  border-color: var(--border-light);
+}
+
+.win-btn {
+  width: 22px;
+  padding: 2px 0;
+  text-align: center;
+}
+
+.close-btn:hover {
+  color: #cc4444;
+}
