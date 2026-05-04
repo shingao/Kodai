@@ -8,7 +8,7 @@ function fmtDuration(secs) {
   return `${m}m`
 }
 
-export default function Header({ trackCount, totalDuration, scanning, onFocus, onRescan }) {
+export default function Header({ trackCount, totalDuration, scanning, onFocus, onRescan, currentPlaylist, onClearPlaylist }) {
   const api = window.electronAPI
 
   return (
@@ -18,6 +18,11 @@ export default function Header({ trackCount, totalDuration, scanning, onFocus, o
         <span className="header-version">v1.0</span>
         {scanning ? (
           <span className="header-meta scanning">· scanning...</span>
+        ) : currentPlaylist ? (
+          <span className="header-meta">
+            · playlist: <span className="header-playlist">{currentPlaylist}</span>
+            <button className="header-clear-pl" onClick={onClearPlaylist} style={{ WebkitAppRegion: 'no-drag' }}>✕</button>
+          </span>
         ) : (
           <span className="header-meta">
             · {trackCount} tracks · {fmtDuration(totalDuration)}

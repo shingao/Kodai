@@ -18,3 +18,10 @@
   overflow: hidden;
   min-height: 0;
 }
+
+.content-area {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  min-width: 0;
+}

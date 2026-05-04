@@ -37,12 +37,10 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
-  // Register file:// protocol to serve local audio files
   protocol.registerFileProtocol('localfile', (request, callback) => {
     const filePath = decodeURIComponent(request.url.replace('localfile://', ''))
     callback({ path: filePath })
   })
-
   createWindow()
 })
 
@@ -54,32 +52,54 @@ app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) createWindow()
 })
 
+// ── helpers ────────────────────────────────────────────────────────────────
+function playlistsDir() {
+  const dir = path.join(os.homedir(), 'Music', 'SONIC_OS', 'playlists')
+  fs.mkdirSync(dir, { recursive: true })
+  return dir
+}
+
+function dataFile() {
+  const dir = path.join(os.homedir(), '.config', 'sonic-os')
+  fs.mkdirSync(dir, { recursive: true })
+  return path.join(dir, 'data.json')
+}
+
+function loadData() {
+  try {
+    const raw = fs.readFileSync(dataFile(), 'utf8')
+    return JSON.parse(raw)
+  } catch {
+    return { tags: {} }
+  }
+}
+
+function saveData(data) {
+  fs.writeFileSync(dataFile(), JSON.stringify(data, null, 2))
+}
+
 // ── IPC: scan directories ──────────────────────────────────────────────────
 ipcMain.handle('scan-dirs', async (event, dirs) => {
   const { parseFile } = await import('music-metadata')
   const EXTENSIONS = new Set(['.mp3', '.flac', '.wav', '.ogg', '.m4a'])
   const tracks = []
+  const data = loadData()
 
   async function walk(dir) {
     let entries
-    try {
-      entries = fs.readdirSync(dir, { withFileTypes: true })
-    } catch {
-      return
-    }
+    try { entries = fs.readdirSync(dir, { withFileTypes: true }) } catch { return }
     for (const entry of entries) {
       const full = path.join(dir, entry.name)
       if (entry.isDirectory()) {
-        if (!entry.name.startsWith('.') && entry.name !== 'node_modules') {
-          await walk(full)
-        }
+        if (!entry.name.startsWith('.') && entry.name !== 'node_modules') await walk(full)
       } else if (EXTENSIONS.has(path.extname(entry.name).toLowerCase())) {
         try {
           const stat = fs.statSync(full)
           const meta = await parseFile(full, { duration: true, skipCovers: true })
           const { common, format } = meta
+          const id = Buffer.from(full).toString('base64')
           tracks.push({
-            id: Buffer.from(full).toString('base64'),
+            id,
             path: full,
             title: common.title || path.basename(full, path.extname(full)),
             artist: common.artist || common.albumartist || 'Unknown Artist',
@@ -89,11 +109,9 @@ ipcMain.handle('scan-dirs', async (event, dirs) => {
             bpm: common.bpm || null,
             addedAt: stat.mtimeMs,
             playCount: 0,
-            tags: [],
+            tags: data.tags?.[id] || [],
           })
-        } catch {
-          // skip unreadable files
-        }
+        } catch { /* skip */ }
       }
     }
   }
@@ -101,7 +119,6 @@ ipcMain.handle('scan-dirs', async (event, dirs) => {
   for (const dir of dirs) {
     if (fs.existsSync(dir)) await walk(dir)
   }
-
   return tracks
 })
 
@@ -118,9 +135,7 @@ ipcMain.handle('get-default-dirs', () => {
 
 // ── IPC: pick directory ────────────────────────────────────────────────────
 ipcMain.handle('pick-directory', async () => {
-  const result = await dialog.showOpenDialog(mainWindow, {
-    properties: ['openDirectory'],
-  })
+  const result = await dialog.showOpenDialog(mainWindow, { properties: ['openDirectory'] })
   return result.filePaths[0] || null
 })
 
@@ -131,6 +146,77 @@ ipcMain.handle('window-maximize', () => {
   else mainWindow.maximize()
 })
 ipcMain.handle('window-close', () => mainWindow.close())
-ipcMain.handle('window-resize', (_, { width, height }) => {
-  mainWindow.setSize(width, height, true)
+ipcMain.handle('window-resize', (_, { width, height }) => mainWindow.setSize(width, height, true))
+
+// ── IPC: playlists ─────────────────────────────────────────────────────────
+ipcMain.handle('playlist-list', () => {
+  const dir = playlistsDir()
+  return fs.readdirSync(dir)
+    .filter(f => f.endsWith('.m3u'))
+    .map(f => {
+      const name = f.replace(/\.m3u$/, '')
+      const content = fs.readFileSync(path.join(dir, f), 'utf8')
+      const paths = content.split('\n')
+        .map(l => l.trim())
+        .filter(l => l && !l.startsWith('#'))
+      return { name, paths }
+    })
+})
+
+ipcMain.handle('playlist-create', (_, name) => {
+  const file = path.join(playlistsDir(), `${name}.m3u`)
+  if (!fs.existsSync(file)) fs.writeFileSync(file, '#EXTM3U\n')
+  return true
+})
+
+ipcMain.handle('playlist-rename', (_, { oldName, newName }) => {
+  const dir = playlistsDir()
+  fs.renameSync(path.join(dir, `${oldName}.m3u`), path.join(dir, `${newName}.m3u`))
+  return true
+})
+
+ipcMain.handle('playlist-delete', (_, name) => {
+  fs.unlinkSync(path.join(playlistsDir(), `${name}.m3u`))
+  return true
+})
+
+ipcMain.handle('playlist-save', (_, { name, paths }) => {
+  const lines = ['#EXTM3U', ...paths]
+  fs.writeFileSync(path.join(playlistsDir(), `${name}.m3u`), lines.join('\n') + '\n')
+  return true
+})
+
+ipcMain.handle('playlist-export', async (_, { name, paths }) => {
+  const result = await dialog.showSaveDialog(mainWindow, {
+    defaultPath: `${name}.m3u`,
+    filters: [{ name: 'M3U Playlist', extensions: ['m3u'] }],
+  })
+  if (!result.filePath) return false
+  fs.writeFileSync(result.filePath, ['#EXTM3U', ...paths].join('\n') + '\n')
+  return true
+})
+
+ipcMain.handle('playlist-import', async () => {
+  const result = await dialog.showOpenDialog(mainWindow, {
+    filters: [{ name: 'M3U Playlist', extensions: ['m3u', 'm3u8'] }],
+    properties: ['openFile'],
+  })
+  if (!result.filePaths[0]) return null
+  const content = fs.readFileSync(result.filePaths[0], 'utf8')
+  const paths = content.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('#'))
+  const name = path.basename(result.filePaths[0], path.extname(result.filePaths[0]))
+  return { name, paths }
+})
+
+// ── IPC: tags ──────────────────────────────────────────────────────────────
+ipcMain.handle('tags-save', (_, { trackId, tags }) => {
+  const data = loadData()
+  if (!data.tags) data.tags = {}
+  data.tags[trackId] = tags
+  saveData(data)
+  return true
+})
+
+ipcMain.handle('tags-load-all', () => {
+  return loadData().tags || {}
 })

@@ -71,3 +71,21 @@
 .close-btn:hover {
   color: #cc4444;
 }
+
+.header-playlist {
+  color: var(--text);
+}
+
+.header-clear-pl {
+  color: var(--text-dimmer);
+  font-size: 10px;
+  margin-left: 5px;
+  padding: 0 3px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  vertical-align: middle;
+}
+.header-clear-pl:hover {
+  color: var(--text);
+  border-color: var(--border-light);
+}

@@ -1,4 +1,5 @@
-import React, { useRef, useEffect } from 'react'
+import React, { useRef, useEffect, useState } from 'react'
+import TagEditor from './TagEditor'
 import './TrackList.css'
 
 function fmtDur(secs) {
@@ -13,15 +14,27 @@ function truncate(str, max) {
   return str.length > max ? str.slice(0, max - 1) + '…' : str
 }
 
-export default function TrackList({ tracks, currentTrack, isPlaying, onPlay, onAddToQueue }) {
-  const listRef = useRef(null)
+export default function TrackList({ tracks, currentTrack, isPlaying, onPlay, onAddToQueue, onTagSave, playlists, onAddToPlaylist }) {
   const activeRef = useRef(null)
+  const [editingTag, setEditingTag] = useState(null)
+  const [ctxMenu, setCtxMenu] = useState(null)
 
   useEffect(() => {
     if (activeRef.current) {
       activeRef.current.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
     }
   }, [currentTrack?.id])
+
+  useEffect(() => {
+    const close = () => setCtxMenu(null)
+    window.addEventListener('click', close)
+    return () => window.removeEventListener('click', close)
+  }, [])
+
+  const handleContext = (e, track) => {
+    e.preventDefault()
+    setCtxMenu({ x: e.clientX, y: e.clientY, track })
+  }
 
   if (!tracks.length) {
     return (
@@ -32,7 +45,7 @@ export default function TrackList({ tracks, currentTrack, isPlaying, onPlay, onA
   }
 
   return (
-    <div className="tracklist" ref={listRef}>
+    <div className="tracklist">
       <div className="tracklist-header">
         <span className="col-num">#</span>
         <span className="col-title">TITLE</span>
@@ -49,11 +62,8 @@ export default function TrackList({ tracks, currentTrack, isPlaying, onPlay, onA
               ref={isActive ? activeRef : null}
               className={`track-row ${isActive ? 'active' : ''}`}
               onDoubleClick={() => onPlay(track)}
-              onContextMenu={(e) => {
-                e.preventDefault()
-                onAddToQueue(track)
-              }}
-              title={`${track.artist} — ${track.title}\nRight-click: add to queue`}
+              onContextMenu={e => handleContext(e, track)}
+              title={`${track.artist} — ${track.title}\nRight-click for options`}
             >
               <span className="col-num">
                 {isActive
@@ -62,10 +72,26 @@ export default function TrackList({ tracks, currentTrack, isPlaying, onPlay, onA
                 }
               </span>
               <span className="col-title">
-                {track.tags?.length > 0 && (
-                  <span className="tags">{track.tags.map((t) => `[#${t}]`).join(' ')} </span>
+                {editingTag === track.id ? (
+                  <TagEditor
+                    track={track}
+                    onSave={onTagSave}
+                    onClose={() => setEditingTag(null)}
+                  />
+                ) : (
+                  <>
+                    {track.tags?.length > 0 && (
+                      <span
+                        className="tags"
+                        onClick={e => { e.stopPropagation(); setEditingTag(track.id) }}
+                        title="Click to edit tags"
+                      >
+                        {track.tags.map(t => `[#${t}]`).join(' ')}{' '}
+                      </span>
+                    )}
+                    {truncate(track.title, 36)}
+                  </>
                 )}
-                {truncate(track.title, 36)}
               </span>
               <span className="col-artist">{truncate(track.artist, 24)}</span>
               <span className="col-album">{truncate(track.album, 24)}</span>
@@ -74,6 +100,40 @@ export default function TrackList({ tracks, currentTrack, isPlaying, onPlay, onA
           )
         })}
       </div>
+
+      {ctxMenu && (
+        <div
+          className="ctx-menu"
+          style={{ left: ctxMenu.x, top: ctxMenu.y }}
+          onClick={e => e.stopPropagation()}
+        >
+          <div className="ctx-item" onClick={() => { onPlay(ctxMenu.track); setCtxMenu(null) }}>
+            ▶ play now
+          </div>
+          <div className="ctx-item" onClick={() => { onAddToQueue(ctxMenu.track); setCtxMenu(null) }}>
+            + add to queue
+          </div>
+          <div className="ctx-divider" />
+          <div className="ctx-item" onClick={() => { setEditingTag(ctxMenu.track.id); setCtxMenu(null) }}>
+            # edit tags
+          </div>
+          {playlists?.length > 0 && (
+            <>
+              <div className="ctx-divider" />
+              <div className="ctx-sub-label">add to playlist</div>
+              {playlists.map(pl => (
+                <div
+                  key={pl.name}
+                  className="ctx-item ctx-indent"
+                  onClick={() => { onAddToPlaylist(ctxMenu.track, pl.name); setCtxMenu(null) }}
+                >
+                  › {pl.name}
+                </div>
+              ))}
+            </>
+          )}
+        </div>
+      )}
     </div>
   )
 }
