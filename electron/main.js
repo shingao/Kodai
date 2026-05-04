@@ -148,10 +148,25 @@ ipcMain.handle('window-maximize', () => {
 ipcMain.handle('window-close', () => mainWindow.close())
 ipcMain.handle('window-resize', (_, { width, height }) => mainWindow.setSize(width, height, true))
 
+// ── IPC: focus mode (Task 2) ───────────────────────────────────────────────
+let preFocusSize = null
+ipcMain.handle('window-focus-mode', (_, { enter }) => {
+  if (enter) {
+    preFocusSize = mainWindow.getSize()
+    mainWindow.setAlwaysOnTop(true, 'floating')
+    mainWindow.setResizable(false)
+    mainWindow.setSize(preFocusSize[0], 36, true)
+  } else {
+    mainWindow.setAlwaysOnTop(false)
+    mainWindow.setResizable(true)
+    if (preFocusSize) mainWindow.setSize(preFocusSize[0], preFocusSize[1], true)
+  }
+})
+
 // ── IPC: playlists ─────────────────────────────────────────────────────────
 ipcMain.handle('playlist-list', () => {
   const dir = playlistsDir()
-  return fs.readdirSync(dir)
+  const regular = fs.readdirSync(dir)
     .filter(f => f.endsWith('.m3u'))
     .map(f => {
       const name = f.replace(/\.m3u$/, '')
@@ -159,8 +174,18 @@ ipcMain.handle('playlist-list', () => {
       const paths = content.split('\n')
         .map(l => l.trim())
         .filter(l => l && !l.startsWith('#'))
-      return { name, paths }
+      return { name, paths, smart: false }
     })
+  const smart = fs.readdirSync(dir)
+    .filter(f => f.startsWith('_smart_') && f.endsWith('.json'))
+    .map(f => {
+      try {
+        const data = JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8'))
+        return { ...data, smart: true, paths: [] }
+      } catch { return null }
+    })
+    .filter(Boolean)
+  return [...regular, ...smart]
 })
 
 ipcMain.handle('playlist-create', (_, name) => {
@@ -208,6 +233,58 @@ ipcMain.handle('playlist-import', async () => {
   return { name, paths }
 })
 
+// ── IPC: smart playlists (Task 3) ─────────────────────────────────────────
+ipcMain.handle('smart-playlist-create', (_, { name, rules, limit, sortBy, sortDir }) => {
+  const data = { name, type: 'smart', rules: rules || [], limit: limit || 50, sortBy: sortBy || 'addedAt', sortDir: sortDir || 'desc' }
+  fs.writeFileSync(path.join(playlistsDir(), `_smart_${name}.json`), JSON.stringify(data, null, 2))
+  return true
+})
+
+ipcMain.handle('smart-playlist-delete', (_, name) => {
+  const file = path.join(playlistsDir(), `_smart_${name}.json`)
+  if (fs.existsSync(file)) fs.unlinkSync(file)
+  return true
+})
+
+ipcMain.handle('smart-playlist-eval', (_, { rules, limit, sortBy, sortDir, tracks }) => {
+  const DAY = 86400000
+  const now = Date.now()
+  const cutoff = (val) => {
+    if (val === 'today') return now - DAY
+    if (val === 'week') return now - 7 * DAY
+    if (val === 'month') return now - 30 * DAY
+    return 0
+  }
+
+  let result = tracks.filter(t => {
+    return (rules || []).every(rule => {
+      const { field, op, value } = rule
+      if (field === 'tag') {
+        const has = (t.tags || []).some(tg => tg.toLowerCase().includes(String(value).toLowerCase()))
+        return op === 'not' ? !has : has
+      }
+      if (field === 'addedAt' && op === 'within') return t.addedAt >= cutoff(value)
+      const tv = t[field]
+      if (tv === undefined || tv === null) return false
+      const num = parseFloat(value)
+      if (op === '>') return parseFloat(tv) > num
+      if (op === '<') return parseFloat(tv) < num
+      if (op === '=') return String(tv).toLowerCase() === String(value).toLowerCase()
+      if (op === 'includes') return String(tv).toLowerCase().includes(String(value).toLowerCase())
+      if (op === 'not') return String(tv).toLowerCase() !== String(value).toLowerCase()
+      return true
+    })
+  })
+
+  const dir = sortDir === 'asc' ? 1 : -1
+  result.sort((a, b) => {
+    const av = a[sortBy] ?? 0, bv = b[sortBy] ?? 0
+    return av < bv ? -dir : av > bv ? dir : 0
+  })
+
+  return result.slice(0, limit || 50)
+})
+
 // ── IPC: tags ──────────────────────────────────────────────────────────────
 ipcMain.handle('tags-save', (_, { trackId, tags }) => {
   const data = loadData()
@@ -219,4 +296,52 @@ ipcMain.handle('tags-save', (_, { trackId, tags }) => {
 
 ipcMain.handle('tags-load-all', () => {
   return loadData().tags || {}
+})
+
+// ── IPC: chokidar watch (Task 4) ───────────────────────────────────────────
+let watcher = null
+
+ipcMain.handle('watch-start', async (_, dirs) => {
+  const { parseFile } = await import('music-metadata')
+  const chokidar = require('chokidar')
+  const EXTENSIONS = new Set(['.mp3', '.flac', '.wav', '.ogg', '.m4a'])
+
+  if (watcher) { await watcher.close(); watcher = null }
+
+  watcher = chokidar.watch(dirs.filter(d => fs.existsSync(d)), {
+    ignored: /(^|[/\\])\../,
+    persistent: true,
+    ignoreInitial: true,
+    awaitWriteFinish: { stabilityThreshold: 1500, pollInterval: 200 },
+  })
+
+  watcher.on('add', async (filePath) => {
+    if (!EXTENSIONS.has(path.extname(filePath).toLowerCase())) return
+    try {
+      const stat = fs.statSync(filePath)
+      const meta = await parseFile(filePath, { duration: true, skipCovers: true })
+      const { common, format } = meta
+      const data = loadData()
+      const id = Buffer.from(filePath).toString('base64')
+      const track = {
+        id,
+        path: filePath,
+        title: common.title || path.basename(filePath, path.extname(filePath)),
+        artist: common.artist || common.albumartist || 'Unknown Artist',
+        album: common.album || 'Unknown Album',
+        year: common.year || null,
+        duration: format.duration || 0,
+        bpm: common.bpm || null,
+        addedAt: stat.mtimeMs,
+        playCount: 0,
+        tags: data.tags?.[id] || [],
+      }
+      mainWindow?.webContents.send('track-added', track)
+    } catch { /* skip */ }
+  })
+
+  watcher.on('unlink', (filePath) => {
+    if (!EXTENSIONS.has(path.extname(filePath).toLowerCase())) return
+    mainWindow?.webContents.send('track-removed', filePath)
+  })
 })

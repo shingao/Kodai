@@ -11,6 +11,7 @@ import FocusMode from './components/FocusMode'
 import EmptyState from './components/EmptyState'
 import QueuePanel from './components/QueuePanel'
 import StatsView from './components/StatsView'
+import ResizeDivider, { usePanelWidth } from './components/ResizeDivider'
 import './styles/layout.css'
 
 export default function App() {
@@ -38,13 +39,15 @@ export default function App() {
   const [playlistPaths, setPlaylistPaths] = useState([])
   const [playlists, setPlaylists] = useState([])
   const [queueVisible, setQueueVisible] = useState(true)
+  const [newTrackFlash, setNewTrackFlash] = useState(null)
+
+  // ── Panel widths (Task 1) ─────────────────────────────────────────────────
+  const [sidebarWidth, setSidebarWidth] = usePanelWidth('sidebar', 150, 90, 220)
+  const [queueWidth, setQueueWidth] = usePanelWidth('queue', 200, 120, 320)
 
   const filteredTracks = useSearch(tracks, searchQuery)
-  const filteredRef = useRef(filteredTracks)
-  filteredRef.current = filteredTracks
   const api = window.electronAPI
 
-  // ── playlist tracks (resolved from paths) ─────────────────────────────────
   const playlistTracks = useRef([])
   playlistTracks.current = playlistPaths.length
     ? tracks.filter(t => playlistPaths.includes(t.path))
@@ -72,11 +75,29 @@ export default function App() {
       } finally {
         setScanning(false)
       }
-      // load playlists
       loadPlaylists()
+      // start chokidar watch (Task 4)
+      api.watchStart?.(dirs)
     }
     init()
   }, []) // eslint-disable-line
+
+  // ── Chokidar listeners (Task 4) ───────────────────────────────────────────
+  useEffect(() => {
+    if (!api?.onTrackAdded) return
+    const removeAdded = api.onTrackAdded((track) => {
+      setTracks(prev => {
+        if (prev.find(t => t.id === track.id)) return prev
+        setNewTrackFlash(`+1 track detected`)
+        setTimeout(() => setNewTrackFlash(null), 3000)
+        return [track, ...prev]
+      })
+    })
+    const removeRemoved = api.onTrackRemoved((filePath) => {
+      setTracks(prev => prev.filter(t => t.path !== filePath))
+    })
+    return () => { removeAdded?.(); removeRemoved?.() }
+  }, [setTracks])
 
   const loadPlaylists = useCallback(async () => {
     if (!api) return
@@ -89,21 +110,30 @@ export default function App() {
     const handler = (e) => {
       const tag = document.activeElement?.tagName
       if (tag === 'INPUT') return
-
       if (e.code === 'Space') { e.preventDefault(); setIsPlaying(p => !p) }
       if (e.code === 'ArrowRight' && !e.shiftKey) playNext()
       if (e.code === 'ArrowLeft') playPrev()
       if (e.code === 'ArrowUp') { e.preventDefault(); setVolume(Math.min(1, volume + 0.05)) }
       if (e.code === 'ArrowDown') { e.preventDefault(); setVolume(Math.max(0, volume - 0.05)) }
-      if (e.code === 'KeyF' && !e.ctrlKey && !e.metaKey) store.setFocusMode(true)
+      if (e.code === 'KeyF' && !e.ctrlKey && !e.metaKey) enterFocus()
       if (e.code === 'ArrowRight' && e.shiftKey) {
-        // SHIFT+→: add selected track to queue (add currently highlighted / playing)
         if (currentTrack) setQueue(q => [...q, currentTrack])
       }
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
   }, [volume, currentTrack, shuffleOn]) // eslint-disable-line
+
+  // ── Focus mode (Task 2) ───────────────────────────────────────────────────
+  const enterFocus = useCallback(() => {
+    store.setFocusMode(true)
+    api?.windowFocusMode?.({ enter: true })
+  }, [api])
+
+  const exitFocus = useCallback(() => {
+    store.setFocusMode(false)
+    api?.windowFocusMode?.({ enter: false })
+  }, [api])
 
   // ── Playback navigation ───────────────────────────────────────────────────
   const activeList = useRef(displayTracks)
@@ -112,16 +142,11 @@ export default function App() {
   const playNext = useCallback(() => {
     const list = activeList.current
     if (!list.length) return
-
     if (queue.length) {
       const [next, ...rest] = queue
-      setQueue(rest)
-      setCurrentTrack(next)
-      logPlay(next)
-      return
+      setQueue(rest); setCurrentTrack(next); logPlay(next); return
     }
     if (!currentTrack) { setCurrentTrack(list[0]); logPlay(list[0]); return }
-
     if (shuffleOn) {
       const others = list.filter(t => t.id !== currentTrack.id)
       if (!others.length) return
@@ -140,8 +165,8 @@ export default function App() {
     const list = activeList.current
     if (!list.length || !currentTrack) return
     const idx = list.findIndex(t => t.id === currentTrack.id)
-    const prev = list[(idx - 1 + list.length) % list.length]
-    setCurrentTrack(prev); logPlay(prev)
+    setCurrentTrack(list[(idx - 1 + list.length) % list.length])
+    logPlay(list[(idx - 1 + list.length) % list.length])
   }, [currentTrack, setCurrentTrack, logPlay])
 
   const playTrack = useCallback((track) => {
@@ -169,34 +194,25 @@ export default function App() {
 
   // ── Playlists ─────────────────────────────────────────────────────────────
   const handlePlaylistSelect = useCallback((name, paths) => {
-    setCurrentPlaylist(name)
-    setPlaylistPaths(paths || [])
-    setActiveView('library')
-    setSearchQuery('')
+    setCurrentPlaylist(name); setPlaylistPaths(paths || [])
+    setActiveView('library'); setSearchQuery('')
   }, [setActiveView, setSearchQuery])
 
   const handlePlaylistPlay = useCallback((pl) => {
     const resolved = tracks.filter(t => pl.paths.includes(t.path))
     if (!resolved.length) return
-    setCurrentPlaylist(pl.name)
-    setPlaylistPaths(pl.paths)
-    setCurrentTrack(resolved[0])
-    logPlay(resolved[0])
-    setIsPlaying(true)
+    setCurrentPlaylist(pl.name); setPlaylistPaths(pl.paths)
+    setCurrentTrack(resolved[0]); logPlay(resolved[0]); setIsPlaying(true)
   }, [tracks, setCurrentTrack, logPlay, setIsPlaying])
 
   const handleAddToPlaylist = useCallback(async (track, playlistName) => {
     if (!api) return
     const list = await api.playlistList()
     const pl = list.find(p => p.name === playlistName)
-    if (!pl) return
-    if (!pl.paths.includes(track.path)) {
-      await api.playlistSave({ name: playlistName, paths: [...pl.paths, track.path] })
-      loadPlaylists()
-      if (currentPlaylist === playlistName) {
-        setPlaylistPaths(prev => [...prev, track.path])
-      }
-    }
+    if (!pl || pl.paths.includes(track.path)) return
+    await api.playlistSave({ name: playlistName, paths: [...pl.paths, track.path] })
+    loadPlaylists()
+    if (currentPlaylist === playlistName) setPlaylistPaths(prev => [...prev, track.path])
   }, [api, currentPlaylist, loadPlaylists])
 
   // ── Tags ──────────────────────────────────────────────────────────────────
@@ -206,9 +222,7 @@ export default function App() {
   }, [api, setTracks])
 
   // ── Queue ─────────────────────────────────────────────────────────────────
-  const removeFromQueue = useCallback((idx) => {
-    setQueue(q => q.filter((_, i) => i !== idx))
-  }, [setQueue])
+  const removeFromQueue = useCallback((idx) => setQueue(q => q.filter((_, i) => i !== idx)), [setQueue])
 
   if (focusMode) {
     return (
@@ -218,7 +232,7 @@ export default function App() {
         progress={progress}
         duration={duration}
         onPlayPause={() => setIsPlaying(p => !p)}
-        onExit={() => store.setFocusMode(false)}
+        onExit={exitFocus}
       />
     )
   }
@@ -231,7 +245,8 @@ export default function App() {
         trackCount={tracks.length}
         totalDuration={totalDuration}
         scanning={scanning}
-        onFocus={() => store.setFocusMode(true)}
+        newTrackFlash={newTrackFlash}
+        onFocus={enterFocus}
         onRescan={() => rescan()}
         currentPlaylist={currentPlaylist}
         onClearPlaylist={() => { setCurrentPlaylist(null); setPlaylistPaths([]) }}
@@ -246,13 +261,17 @@ export default function App() {
       </div>
       <div className="main-area">
         <Sidebar
+          style={{ width: sidebarWidth, minWidth: sidebarWidth }}
           activeView={activeView}
           setActiveView={v => { setActiveView(v); setCurrentPlaylist(null); setPlaylistPaths([]) }}
           currentPlaylist={currentPlaylist}
           onPlaylistSelect={handlePlaylistSelect}
           onPlaylistPlay={handlePlaylistPlay}
           tracks={tracks}
+          onPlaylistsChange={loadPlaylists}
         />
+
+        <ResizeDivider onDrag={dx => setSidebarWidth(w => w + dx)} />
 
         <div className="content-area">
           {activeView === 'stats' && !currentPlaylist ? (
@@ -273,7 +292,10 @@ export default function App() {
           )}
         </div>
 
+        <ResizeDivider onDrag={dx => setQueueWidth(w => w - dx)} />
+
         <QueuePanel
+          style={{ width: queueWidth, minWidth: queueWidth }}
           queue={queue}
           visible={queueVisible}
           onToggle={() => setQueueVisible(v => !v)}

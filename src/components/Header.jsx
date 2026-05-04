@@ -8,7 +8,7 @@ function fmtDuration(secs) {
   return `${m}m`
 }
 
-export default function Header({ trackCount, totalDuration, scanning, onFocus, onRescan, currentPlaylist, onClearPlaylist }) {
+export default function Header({ trackCount, totalDuration, scanning, newTrackFlash, onFocus, onRescan, currentPlaylist, onClearPlaylist }) {
   const api = window.electronAPI
 
   return (
@@ -16,7 +16,9 @@ export default function Header({ trackCount, totalDuration, scanning, onFocus, o
       <div className="header-title">
         <span className="header-logo">SONIC_OS</span>
         <span className="header-version">v1.0</span>
-        {scanning ? (
+        {newTrackFlash ? (
+          <span className="header-meta scanning">· {newTrackFlash}</span>
+        ) : scanning ? (
           <span className="header-meta scanning">· scanning...</span>
         ) : currentPlaylist ? (
           <span className="header-meta">

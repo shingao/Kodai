@@ -9,7 +9,7 @@
 
 .queue-panel.open {
   width: 200px;
-  min-width: 200px;
+  min-width: 120px;
 }
 
 .queue-panel.closed {

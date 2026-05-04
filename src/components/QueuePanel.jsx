@@ -8,7 +8,7 @@ function fmtDur(secs) {
   return `${m}:${s.toString().padStart(2, '0')}`
 }
 
-export default function QueuePanel({ queue, onRemove, onClear, onReorder, visible, onToggle }) {
+export default function QueuePanel({ style, queue, onRemove, onClear, onReorder, visible, onToggle }) {
   const dragIdx = useRef(null)
 
   const handleDragStart = (e, idx) => {
@@ -27,7 +27,7 @@ export default function QueuePanel({ queue, onRemove, onClear, onReorder, visibl
   }
 
   return (
-    <div className={`queue-panel ${visible ? 'open' : 'closed'}`}>
+    <div className={`queue-panel ${visible ? 'open' : 'closed'}`} style={visible ? style : undefined}>
       <div className="queue-header">
         <span className="queue-title">QUEUE</span>
         <span className="queue-count">{queue.length > 0 ? `${queue.length} tracks` : 'empty'}</span>

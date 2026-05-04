@@ -8,9 +8,9 @@ const VIEWS = [
   { id: 'stats', label: 'STATS' },
 ]
 
-export default function Sidebar({ activeView, setActiveView, currentPlaylist, onPlaylistSelect, onPlaylistPlay, tracks }) {
+export default function Sidebar({ style, activeView, setActiveView, currentPlaylist, onPlaylistSelect, onPlaylistPlay, tracks, onPlaylistsChange }) {
   return (
-    <nav className="sidebar">
+    <nav className="sidebar" style={style}>
       {VIEWS.map((v) => (
         <button
           key={v.id}
@@ -26,6 +26,7 @@ export default function Sidebar({ activeView, setActiveView, currentPlaylist, on
         currentPlaylist={currentPlaylist}
         onSelect={onPlaylistSelect}
         onPlay={onPlaylistPlay}
+        onChanged={onPlaylistsChange}
       />
     </nav>
   )

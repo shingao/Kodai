@@ -1,0 +1,15 @@
+.resize-divider {
+  width: 5px;
+  min-width: 5px;
+  cursor: col-resize;
+  background: var(--border);
+  flex-shrink: 0;
+  transition: background 0.1s;
+  position: relative;
+  z-index: 10;
+}
+
+.resize-divider:hover,
+.resize-divider:active {
+  background: var(--border-light);
+}

@@ -99,6 +99,13 @@
   width: 14px;
 }
 
+.pl-smart-icon {
+  font-size: 9px;
+  color: var(--text-dimmer);
+  flex-shrink: 0;
+  margin-right: 2px;
+}
+
 .pl-name {
   flex: 1;
   min-width: 0;
