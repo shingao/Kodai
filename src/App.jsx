@@ -387,10 +387,15 @@ export default function App() {
         onShuffle={() => setShuffleOn(!shuffleOn)}
       />
       <div className="foot-strip">
-        <span className="fig">FIG. 01 / KODAI · {(currentPlaylist || activeView).toUpperCase()}</span>
+        <span className="fig">FIG. 01 / KODAI · {(currentPlaylist || currentCrate || activeView).toUpperCase()}</span>
         <span className="group">
-          {isPlaying ? <span className="live">● LIVE</span> : <span>○ IDLE</span>}
-          <span>{tracks.length} TRK</span>
+          {scanning
+            ? <span className="live">◌ SCANNING</span>
+            : isPlaying
+              ? <span className="live">● PLAYING</span>
+              : <span>○ IDLE</span>
+          }
+          <span>{displayTracks.length} TRK</span>
           <span>{queue.length} QUEUED</span>
           <span>{'{ NEIRO_OS · 古代 }'}</span>
         </span>

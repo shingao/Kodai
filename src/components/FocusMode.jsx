@@ -27,7 +27,7 @@ export default function FocusMode({ track, isPlaying, progress, duration, onPlay
   return (
     <div className="focus-bar" style={{ WebkitAppRegion: 'drag' }}>
       <button
-        className="focus-play"
+        className={`focus-play ${isPlaying ? 'is-playing' : ''}`}
         onClick={onPlayPause}
         style={{ WebkitAppRegion: 'no-drag' }}
         title="Play/Pause [SPACE]"

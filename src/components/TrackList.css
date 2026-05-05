@@ -18,12 +18,12 @@
 .tracklist-header {
   display: flex;
   align-items: center;
-  padding: 5px 12px;
+  padding: 4px 10px;
   border-bottom: 1px solid var(--border);
   color: var(--text-dimmer);
   font-size: 10px;
   letter-spacing: 0.1em;
-  gap: 8px;
+  gap: 6px;
   flex-shrink: 0;
 }
 
@@ -52,8 +52,8 @@
 .track-row {
   display: flex;
   align-items: center;
-  padding: 5px 12px;
-  gap: 8px;
+  padding: 4px 10px;
+  gap: 6px;
   border-bottom: 1px solid transparent;
   cursor: pointer;
   transition: background 0.1s;
@@ -109,7 +109,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   color: var(--text);
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .track-row.active .col-title {

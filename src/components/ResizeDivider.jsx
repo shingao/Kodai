@@ -7,10 +7,13 @@ export function usePanelWidth(key, defaultWidth, min, max) {
   const stored = parseInt(localStorage.getItem(STORAGE_PREFIX + key)) || defaultWidth
   const [width, setWidthRaw] = React.useState(Math.max(min, Math.min(max, stored)))
 
-  const setWidth = useCallback((w) => {
-    const clamped = Math.max(min, Math.min(max, w))
-    setWidthRaw(clamped)
-    localStorage.setItem(STORAGE_PREFIX + key, clamped)
+  const setWidth = useCallback((wOrFn) => {
+    setWidthRaw(prev => {
+      const next = typeof wOrFn === 'function' ? wOrFn(prev) : wOrFn
+      const clamped = Math.max(min, Math.min(max, next))
+      localStorage.setItem(STORAGE_PREFIX + key, clamped)
+      return clamped
+    })
   }, [key, min, max])
 
   return [width, setWidth]

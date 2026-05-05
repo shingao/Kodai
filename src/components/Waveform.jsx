@@ -1,10 +1,10 @@
 import React, { useRef, useEffect, useCallback } from 'react'
 import './Waveform.css'
 
-const BAR_WIDTH = 3
+const BAR_WIDTH = 2
 const BAR_GAP = 1
 const BAR_STEP = BAR_WIDTH + BAR_GAP
-const MAX_HEIGHT = 28
+const MAX_HEIGHT = 36
 
 export default function Waveform({ progress, duration, onSeek, analyser, isPlaying }) {
   const canvasRef = useRef(null)

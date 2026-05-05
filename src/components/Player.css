@@ -5,7 +5,7 @@
   padding: 8px 14px;
   border-top: 1px solid var(--rule-hi, var(--border));
   background: var(--bg-elevated);
-  min-height: 80px;
+  min-height: 64px;
   flex-shrink: 0;
   position: relative;
 }
@@ -113,7 +113,7 @@
 .controls-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
 }
 
 .ctrl-btn {
