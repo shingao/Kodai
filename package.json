@@ -1,7 +1,7 @@
 {
-  "name": "neiro-os",
-  "version": "1.0.0",
-  "description": "NEIRO_OS — minimal local music manager",
+  "name": "kodai",
+  "version": "1.1.0",
+  "description": "KODAI 古代 — minimal local music manager",
   "main": "electron/main.js",
   "scripts": {
     "start": "concurrently \"npm run dev:react\" \"npm run dev:electron\"",
@@ -27,8 +27,8 @@
     "wait-on": "^8.0.2"
   },
   "build": {
-    "appId": "com.neiro-os.app",
-    "productName": "NEIRO_OS",
+    "appId": "com.kodai.app",
+    "productName": "Kodai",
     "directories": {
       "output": "dist-electron"
     },

@@ -14,10 +14,21 @@
   --text: #e0e0e0;
   --text-dim: #888888;
   --text-dimmer: #555555;
-  --accent: #aaaaaa;
-  --accent-dim: #666666;
   --playing: #cccccc;
   --font: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+  --font-jp: 'M PLUS 1 Code', sans-serif;
+
+  /* Hinageshi signal color (red default, overridden by theme.css presets) */
+  --hi-500: #D9382A;
+  --hi-700: #9E2218;
+  --hi-glow: rgba(217, 56, 42, 0.55);
+
+  /* Derived tokens */
+  --accent: var(--hi-500);
+  --accent-dim: var(--hi-700);
+  --paper: #0d0d0d;
+  --tick: #333333;
+  --rule-hi: #3a3a3a;
 }
 
 html, body, #root {
@@ -72,4 +83,8 @@ input {
 
 .mono {
   font-family: var(--font);
+}
+
+.jp {
+  font-family: var(--font-jp);
 }

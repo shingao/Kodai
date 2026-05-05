@@ -1,0 +1,25 @@
+/* Signal-color presets — set data-theme on <html> to switch */
+
+[data-theme="red"] {
+  --hi-500: #D9382A;
+  --hi-700: #9E2218;
+  --hi-glow: rgba(217, 56, 42, 0.55);
+}
+
+[data-theme="cyan"] {
+  --hi-500: #2ABBD9;
+  --hi-700: #1889A0;
+  --hi-glow: rgba(42, 187, 217, 0.55);
+}
+
+[data-theme="amber"] {
+  --hi-500: #D98B2A;
+  --hi-700: #A06318;
+  --hi-glow: rgba(217, 139, 42, 0.55);
+}
+
+[data-theme="lime"] {
+  --hi-500: #7ED92A;
+  --hi-700: #5AA018;
+  --hi-glow: rgba(126, 217, 42, 0.55);
+}

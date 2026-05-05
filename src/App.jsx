@@ -50,7 +50,6 @@ export default function App() {
   const [currentCrate, setCurrentCrate] = useState(null)
   const [cratePaths, setCratePaths] = useState([])
 
-  // ── Panel widths (Task 1) ─────────────────────────────────────────────────
   const [sidebarWidth, setSidebarWidth] = usePanelWidth('sidebar', 150, 90, 220)
   const [queueWidth, setQueueWidth] = usePanelWidth('queue', 200, 120, 320)
 
@@ -72,7 +71,6 @@ export default function App() {
         ? [...filteredTracks].sort((a, b) => b.addedAt - a.addedAt).slice(0, 50)
         : filteredTracks
 
-  // ── Initial scan ──────────────────────────────────────────────────────────
   useEffect(() => {
     const init = async () => {
       if (!api) return
@@ -95,7 +93,6 @@ export default function App() {
     init()
   }, []) // eslint-disable-line
 
-  // ── Chokidar listeners (Task 4) ───────────────────────────────────────────
   useEffect(() => {
     if (!api?.onTrackAdded) return
     const removeAdded = api.onTrackAdded((track) => {
@@ -129,7 +126,6 @@ export default function App() {
     api?.logAppend({ artist: track.artist, title: track.title })
   }, [logPlay, api])
 
-  // ── Keyboard shortcuts ────────────────────────────────────────────────────
   useEffect(() => {
     const handler = (e) => {
       const tag = document.activeElement?.tagName
@@ -157,7 +153,6 @@ export default function App() {
     return () => window.removeEventListener('keydown', handler)
   }, [volume, currentTrack, shuffleOn, keymap]) // eslint-disable-line
 
-  // ── Focus mode (Task 2) ───────────────────────────────────────────────────
   const enterFocus = useCallback(() => {
     store.setFocusMode(true)
     api?.windowFocusMode?.({ enter: true })
@@ -168,7 +163,6 @@ export default function App() {
     api?.windowFocusMode?.({ enter: false })
   }, [api])
 
-  // ── Playback navigation ───────────────────────────────────────────────────
   const activeList = useRef(displayTracks)
   activeList.current = displayTracks
 
@@ -216,7 +210,6 @@ export default function App() {
 
   const { detecting: bpmDetecting, detect: detectBpm } = useBpmDetect()
 
-  // ── Rescan ────────────────────────────────────────────────────────────────
   const rescan = useCallback(async (dirs) => {
     if (!api) return
     const d = dirs || scanDirs
@@ -229,7 +222,6 @@ export default function App() {
     }
   }, [scanDirs, setScanning, setTracks])
 
-  // ── Playlists ─────────────────────────────────────────────────────────────
   const handlePlaylistSelect = useCallback((name, paths) => {
     setCurrentPlaylist(name); setPlaylistPaths(paths || [])
     setActiveView('library'); setSearchQuery('')
@@ -252,19 +244,16 @@ export default function App() {
     if (currentPlaylist === playlistName) setPlaylistPaths(prev => [...prev, track.path])
   }, [api, currentPlaylist, loadPlaylists])
 
-  // ── Tags ──────────────────────────────────────────────────────────────────
   const handleTagSave = useCallback(async (trackId, tags) => {
     if (api) await api.tagsSave({ trackId, tags })
     setTracks(prev => prev.map(t => t.id === trackId ? { ...t, tags } : t))
   }, [api, setTracks])
 
-  // ── BPM save ──────────────────────────────────────────────────────────────
   const handleBpmSave = useCallback(async (track, bpm) => {
     if (api) await api.bpmSave({ trackId: track.id, bpm })
     setTracks(prev => prev.map(t => t.id === track.id ? { ...t, bpm } : t))
   }, [api, setTracks])
 
-  // ── Crates ────────────────────────────────────────────────────────────────
   const handleCrateSelect = useCallback((name, paths) => {
     setCurrentCrate(name); setCratePaths(paths || [])
     setCurrentPlaylist(null); setPlaylistPaths([])
@@ -281,7 +270,6 @@ export default function App() {
     if (currentCrate === crateName) setCratePaths(prev => [...prev, track.path])
   }, [api, currentCrate, loadCrates])
 
-  // ── Queue ─────────────────────────────────────────────────────────────────
   const removeFromQueue = useCallback((idx) => setQueue(q => q.filter((_, i) => i !== idx)), [setQueue])
 
   if (focusMode) {
@@ -301,6 +289,7 @@ export default function App() {
 
   return (
     <div className="app">
+      <div className="watermark jp">古代</div>
       <Header
         trackCount={tracks.length}
         totalDuration={totalDuration}
@@ -397,6 +386,15 @@ export default function App() {
         onVolume={setVolume}
         onShuffle={() => setShuffleOn(!shuffleOn)}
       />
+      <div className="foot-strip">
+        <span className="fig">FIG. 01 / KODAI · {(currentPlaylist || activeView).toUpperCase()}</span>
+        <span className="group">
+          {isPlaying ? <span className="live">● LIVE</span> : <span>○ IDLE</span>}
+          <span>{tracks.length} TRK</span>
+          <span>{queue.length} QUEUED</span>
+          <span>{'{ NEIRO_OS · 古代 }'}</span>
+        </span>
+      </div>
     </div>
   )
 }

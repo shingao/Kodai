@@ -7,6 +7,7 @@
   min-height: 36px;
   border-bottom: 1px solid var(--border);
   background: var(--bg);
+  position: relative;
 }
 
 .header-title {
@@ -17,7 +18,13 @@
   letter-spacing: 0.05em;
 }
 
-.header-logo {
+.header-kanji {
+  font-size: 13px;
+  color: var(--text-dimmer);
+  line-height: 1;
+}
+
+.header-mark {
   color: var(--text);
   font-weight: 700;
   letter-spacing: 0.15em;
@@ -30,10 +37,20 @@
 
 .header-meta {
   color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .header-meta.scanning {
-  color: var(--accent);
+  color: var(--hi-500);
+  animation: blink 1s step-end infinite;
+}
+
+.dot.live {
+  color: var(--hi-500);
+  font-size: 8px;
+  box-shadow: 0 0 4px var(--hi-glow);
   animation: blink 1s step-end infinite;
 }
 
@@ -69,7 +86,7 @@
 }
 
 .close-btn:hover {
-  color: #cc4444;
+  color: var(--hi-500);
 }
 
 .header-playlist {

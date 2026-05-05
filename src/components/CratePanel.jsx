@@ -63,8 +63,7 @@ export default function CratePanel({ currentCrate, onSelect, onChanged, crates }
 
   return (
     <div className="crate-panel">
-      <div className="cr-header">
-        <span className="cr-title">CRATES</span>
+      <div className="cr-actions-row">
         <button className="cr-btn" onClick={() => setCreating(true)} title="New crate">+</button>
       </div>
 

@@ -45,7 +45,12 @@
 }
 
 .empty-btn:hover {
-  color: var(--text);
-  border-color: var(--text-dimmer);
+  color: var(--hi-500);
+  border-color: var(--hi-500);
   background: var(--bg-hover);
+}
+
+.empty-btn:hover::before {
+  content: '▸ ';
+  color: var(--hi-500);
 }
