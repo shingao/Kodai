@@ -1,0 +1,204 @@
+.player {
+  display: flex;
+  align-items: stretch;
+  gap: 18px;
+  padding: 10px 16px;
+  border-top: 1px solid var(--rule-hi);
+  background: var(--bg-elevated);
+  min-height: 88px;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.player-info {
+  width: 280px;
+  min-width: 220px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  border-right: 1px solid var(--border);
+  padding-right: 16px;
+}
+
+.player-info-inner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.player-info-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.now-playing-label {
+  font-size: 8px;
+  letter-spacing: 0.28em;
+  color: var(--text-dimmer);
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.now-playing-label.dim {
+  color: var(--text-dimmer);
+}
+
+.now-playing-title {
+  font-size: 16px;
+  color: var(--text);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: 0.01em;
+  margin-top: 1px;
+}
+
+.now-playing-track {
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 0.14em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+}
+
+.np-sep {
+  color: var(--text-dimmer);
+}
+
+.np-album {
+  color: var(--hi-500);
+}
+
+.now-playing-codestrip {
+  display: flex;
+  gap: 12px;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: var(--text-dimmer);
+  margin-top: 3px;
+  font-family: var(--font);
+}
+
+.player-center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.waveform-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.time-label {
+  font-size: 11px;
+  color: var(--text-dim);
+  min-width: 38px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.time-label:last-child {
+  text-align: right;
+}
+
+.controls-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ctrl-btn {
+  color: var(--text-dim);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  padding: 4px 8px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  transition: all 0.12s;
+  white-space: nowrap;
+}
+
+.ctrl-btn:hover {
+  color: var(--text);
+  border-color: var(--border-light);
+}
+
+.play-btn {
+  font-size: 12px;
+  border-color: var(--rule-hi);
+  color: var(--text);
+  padding: 4px 14px;
+  min-width: 84px;
+  text-align: center;
+}
+
+.play-btn.is-playing {
+  color: var(--hi-500);
+  border-color: var(--hi-700);
+}
+
+.vol-control {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 8px;
+}
+
+.vol-label {
+  font-size: 9px;
+  color: var(--text-dimmer);
+  letter-spacing: 0.18em;
+  white-space: nowrap;
+}
+
+.vol-bars {
+  color: var(--text-dim);
+  font-size: 10px;
+  letter-spacing: -1px;
+}
+
+.vol-btns {
+  display: flex;
+  gap: 2px;
+}
+
+.vol-btns button {
+  color: var(--text-dimmer);
+  font-size: 12px;
+  padding: 0 4px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+}
+.vol-btns button:hover {
+  color: var(--text);
+  border-color: var(--border-light);
+}
+
+.shuffle-btn {
+  font-size: 10px;
+  margin-left: auto;
+  color: var(--text-dimmer);
+  letter-spacing: 0.06em;
+  padding: 3px 7px;
+}
+
+.shuffle-btn.on {
+  color: var(--hi-500);
+  border-color: var(--hi-700);
+}

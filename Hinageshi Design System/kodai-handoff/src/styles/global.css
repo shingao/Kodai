@@ -1,0 +1,98 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* ── base palette (preserved) ───────────────────────────────── */
+  --bg: #0a0a0a;
+  --bg-elevated: #111111;
+  --bg-hover: #1a1a1a;
+  --bg-selected: #1e1e1e;
+  --border: #222222;
+  --border-light: #2a2a2a;
+  --rule-hi: #3a3a3a;
+  --text: #e0e0e0;
+  --text-dim: #888888;
+  --text-dimmer: #555555;
+  --playing: #cccccc;
+
+  /* ── signal accent (themable, see theme.css) ─────────────────── */
+  --hi-500: #D9382A;       /* default: 緋 hinageshi red */
+  --hi-700: #9E2218;
+  --hi-glow: rgba(217, 56, 42, 0.55);
+
+  /* ── flash extras ────────────────────────────────────────────── */
+  --paper: #F4F2EC;
+  --tick: var(--text-dimmer);
+
+  /* ── type ────────────────────────────────────────────────────── */
+  --font: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+  --font-jp: 'M PLUS 1 Code', 'JetBrains Mono', monospace;
+}
+
+/* legacy --accent / --accent-dim mapped to the signal so existing
+   styles light up without a search-and-replace */
+:root {
+  --accent: var(--hi-500);
+  --accent-dim: var(--hi-700);
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 12px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-light);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-dimmer);
+}
+
+button {
+  background: none;
+  border: none;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+  padding: 0;
+}
+
+input {
+  background: none;
+  border: none;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  outline: none;
+}
+
+.mono {
+  font-family: var(--font);
+}
+
+.jp {
+  font-family: var(--font-jp);
+}

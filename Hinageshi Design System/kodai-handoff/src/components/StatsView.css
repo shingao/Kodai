@@ -1,0 +1,176 @@
+.stats-view {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.stats-section {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.stats-label {
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-dimmer);
+  margin-bottom: 4px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.stats-label::before {
+  content: "";
+  width: 2px;
+  height: 10px;
+  background: var(--hi-500);
+}
+
+.stats-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+}
+
+.stats-key {
+  color: var(--text-dim);
+}
+
+.stats-val {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.sparkline-wrap {
+  overflow: hidden;
+}
+
+.sparkline {
+  font-size: 14px;
+  color: var(--hi-500);
+  letter-spacing: 1px;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.sparkline-axis {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  color: var(--text-dimmer);
+  margin-top: 2px;
+}
+
+.stats-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  padding: 2px 0;
+}
+
+.stats-rank {
+  color: var(--text-dimmer);
+  font-size: 10px;
+  width: 18px;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.stats-bar-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.stats-bar-name {
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stats-bar-sub {
+  color: var(--text-dimmer);
+  font-size: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stats-bar-wrap {
+  width: 100px;
+  height: 4px;
+  background: var(--border-light);
+  border-radius: 2px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.stats-bar-fill {
+  height: 100%;
+  background: var(--hi-500);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.stats-bar-count {
+  color: var(--text-dimmer);
+  font-size: 10px;
+  flex-shrink: 0;
+  min-width: 28px;
+  text-align: right;
+}
+
+.never-played-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.never-played-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+}
+
+.np-dot {
+  color: var(--text-dimmer);
+}
+
+.np-title {
+  color: var(--text-dim);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.np-artist {
+  color: var(--text-dimmer);
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
+.never-played-more {
+  font-size: 10px;
+  color: var(--text-dimmer);
+  padding-left: 12px;
+  font-style: italic;
+}
+
+.stats-empty {
+  color: var(--text-dimmer);
+  font-size: 12px;
+  text-align: center;
+  padding: 40px 0;
+  line-height: 2;
+}

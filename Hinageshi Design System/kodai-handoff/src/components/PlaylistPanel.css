@@ -1,0 +1,153 @@
+.playlist-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: 4px;
+}
+
+.pl-actions-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 2px 12px 4px 22px;
+}
+
+.pl-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.pl-btn {
+  color: var(--text-dimmer);
+  font-size: 12px;
+  padding: 0 3px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+}
+.pl-btn:hover {
+  color: var(--text);
+  border-color: var(--border-light);
+}
+
+.pl-input-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  background: var(--bg-selected);
+}
+
+.pl-prompt {
+  color: var(--text-dimmer);
+  font-size: 11px;
+}
+
+.pl-input {
+  flex: 1;
+  font-size: 11px;
+  color: var(--text);
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: var(--font);
+  caret-color: var(--text);
+}
+
+.pl-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.pl-empty {
+  padding: 4px 14px;
+  font-size: 10px;
+  color: var(--text-dimmer);
+  font-style: italic;
+}
+
+.pl-item {
+  display: flex;
+  align-items: center;
+  padding: 4px 8px 4px 22px;
+  cursor: pointer;
+  font-size: 11px;
+  color: var(--text-dim);
+  gap: 2px;
+  position: relative;
+}
+
+.pl-item.active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--hi-500);
+}
+
+.pl-item.active .pl-indicator {
+  color: var(--hi-500);
+}
+
+.pl-item:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+
+.pl-item.active {
+  background: var(--bg-selected);
+  color: var(--text);
+}
+
+.pl-indicator {
+  font-size: 9px;
+  color: var(--text-dimmer);
+  flex-shrink: 0;
+  width: 14px;
+}
+
+.pl-smart-icon {
+  font-size: 9px;
+  color: var(--text-dimmer);
+  flex-shrink: 0;
+  margin-right: 2px;
+}
+
+.pl-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pl-count {
+  font-size: 10px;
+  color: var(--text-dimmer);
+  flex-shrink: 0;
+  margin-left: 4px;
+}
+
+.pl-item-actions {
+  display: none;
+  gap: 2px;
+  margin-left: 4px;
+  flex-shrink: 0;
+}
+
+.pl-item:hover .pl-item-actions {
+  display: flex;
+}
+
+.pl-item-actions button {
+  color: var(--text-dimmer);
+  font-size: 10px;
+  padding: 1px 3px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+}
+.pl-item-actions button:hover {
+  color: var(--text);
+  border-color: var(--border-light);
+}

@@ -1,0 +1,118 @@
+.sidebar {
+  width: 180px;
+  min-width: 120px;
+  border-right: 1px solid var(--border);
+  padding: 10px 0 10px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: var(--bg);
+  overflow-y: auto;
+  position: relative;
+}
+
+/* rotated label down the left edge */
+.sidebar-vlabel {
+  position: absolute;
+  left: 4px;
+  top: 14px;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-size: 8px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-dimmer);
+  font-family: var(--font);
+  pointer-events: none;
+}
+
+.sidebar-item {
+  text-align: left;
+  padding: 4px 12px 4px 22px;
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 0.06em;
+  transition: color 0.1s, background 0.1s;
+  white-space: nowrap;
+  font-family: var(--font);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+}
+
+.sb-arr {
+  display: inline-block;
+  width: 10px;
+  color: var(--text-dimmer);
+  font-size: 10px;
+}
+
+.sidebar-item:hover {
+  color: var(--text);
+  background: var(--bg-hover);
+}
+
+.sidebar-item.active {
+  color: var(--text);
+  background: var(--bg-selected);
+}
+
+.sidebar-item.active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--hi-500);
+}
+
+.sidebar-item.active .sb-arr {
+  color: var(--hi-500);
+}
+
+/* legacy, kept for any inline use */
+.sidebar-divider {
+  padding: 6px 12px 2px 22px;
+  color: var(--text-dimmer);
+  font-size: 10px;
+  letter-spacing: 0.05em;
+}
+
+.sidebar-rule {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 8px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-dimmer);
+  margin: 14px 12px 4px 22px;
+}
+.sidebar-rule::before {
+  content: "";
+  flex: 0 0 12px;
+  height: 1px;
+  background: var(--border-light);
+}
+.sidebar-rule::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.sidebar-section {
+  padding: 4px 12px 4px 22px;
+  font-size: 10px;
+  color: var(--text-dimmer);
+  letter-spacing: 0.1em;
+}
+
+.sidebar-note {
+  padding: 4px 12px 4px 22px;
+  font-size: 10px;
+  color: var(--text-dimmer);
+  font-style: italic;
+}

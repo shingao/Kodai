@@ -1,0 +1,134 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px 0 22px;        /* extra left for tick */
+  height: 38px;
+  min-height: 38px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  position: relative;
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+}
+
+.header-logo {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  color: var(--text);
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  font-size: 12px;
+}
+
+.header-kanji {
+  color: var(--text-dim);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  font-size: 13px;
+}
+
+.header-mark {
+  color: var(--text);
+}
+
+.header-version {
+  color: var(--text-dimmer);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+}
+
+.header-meta {
+  color: var(--text-dim);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.header-meta .dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-dim);
+}
+
+.header-meta .dot.live {
+  background: var(--hi-500);
+  box-shadow: 0 0 4px var(--hi-glow);
+  animation: blink 1.6s infinite;
+}
+
+.header-meta.scanning {
+  color: var(--hi-500);
+}
+
+.header-meta.scanning .dot {
+  background: var(--hi-500);
+  box-shadow: 0 0 4px var(--hi-glow);
+  animation: blink 0.8s step-end infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0.35; }
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.hbtn {
+  color: var(--text-dimmer);
+  font-size: 11px;
+  padding: 3px 7px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  transition: color 0.15s, border-color 0.15s;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.hbtn:hover {
+  color: var(--text);
+  border-color: var(--border-light);
+}
+
+.win-btn {
+  width: 24px;
+  padding: 3px 0;
+  text-align: center;
+}
+
+.close-btn:hover {
+  color: var(--hi-500);
+  border-color: var(--hi-700);
+}
+
+.header-playlist {
+  color: var(--text);
+}
+
+.header-clear-pl {
+  color: var(--text-dimmer);
+  font-size: 10px;
+  margin-left: 5px;
+  padding: 0 3px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  vertical-align: middle;
+}
+.header-clear-pl:hover {
+  color: var(--hi-500);
+  border-color: var(--hi-700);
+}
