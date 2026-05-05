@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
 
-const STORAGE_KEY = 'sonic_os_state'
+const STORAGE_KEY = 'neiro_os_state'
 
 export const DEFAULT_KEYMAP = {
   playPause: 'Space',

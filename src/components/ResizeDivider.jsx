@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef } from 'react'
 import './ResizeDivider.css'
 
-const STORAGE_PREFIX = 'sonic_os_panel_'
+const STORAGE_PREFIX = 'neiro_os_panel_'
 
 export function usePanelWidth(key, defaultWidth, min, max) {
   const stored = parseInt(localStorage.getItem(STORAGE_PREFIX + key)) || defaultWidth

@@ -14,7 +14,7 @@ export default function Header({ trackCount, totalDuration, scanning, newTrackFl
   return (
     <header className="header" style={{ WebkitAppRegion: 'drag' }}>
       <div className="header-title">
-        <span className="header-logo">SONIC_OS</span>
+        <span className="header-logo">NEIRO_OS</span>
         <span className="header-version">v1.0</span>
         {newTrackFlash ? (
           <span className="header-meta scanning">· {newTrackFlash}</span>

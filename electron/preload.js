@@ -21,6 +21,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   smartPlaylistCreate: (args) => ipcRenderer.invoke('smart-playlist-create', args),
   smartPlaylistDelete: (name) => ipcRenderer.invoke('smart-playlist-delete', name),
   smartPlaylistEval: (args) => ipcRenderer.invoke('smart-playlist-eval', args),
+  // cover art
+  getCover: (trackId) => ipcRenderer.invoke('get-cover', trackId),
   // tags
   tagsSave: (args) => ipcRenderer.invoke('tags-save', args),
   tagsLoadAll: () => ipcRenderer.invoke('tags-load-all'),

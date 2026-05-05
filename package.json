@@ -1,7 +1,7 @@
 {
-  "name": "sonic-os",
+  "name": "neiro-os",
   "version": "1.0.0",
-  "description": "SONIC_OS — minimal local music manager",
+  "description": "NEIRO_OS — minimal local music manager",
   "main": "electron/main.js",
   "scripts": {
     "start": "concurrently \"npm run dev:react\" \"npm run dev:electron\"",
@@ -27,8 +27,8 @@
     "wait-on": "^8.0.2"
   },
   "build": {
-    "appId": "com.sonic-os.app",
-    "productName": "SONIC_OS",
+    "appId": "com.neiro-os.app",
+    "productName": "NEIRO_OS",
     "directories": {
       "output": "dist-electron"
     },

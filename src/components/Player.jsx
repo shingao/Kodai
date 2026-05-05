@@ -1,5 +1,6 @@
 import React from 'react'
 import Waveform from './Waveform'
+import AlbumArt from './AlbumArt'
 import './Player.css'
 
 function fmtTime(secs) {
@@ -19,15 +20,18 @@ export default function Player({ track, isPlaying, progress, duration, volume, s
     <footer className="player">
       <div className="player-info">
         {track ? (
-          <>
-            <div className="now-playing-label">NOW PLAYING</div>
-            <div className="now-playing-track">
-              <span className="np-artist">{track.artist?.toUpperCase()}</span>
-              <span className="np-sep"> · </span>
-              <span className="np-album">{track.album?.toUpperCase()}</span>
+          <div className="player-info-inner">
+            <AlbumArt trackId={track.id} hasCover={track.hasCover} size={32} />
+            <div className="player-info-text">
+              <div className="now-playing-label">NOW PLAYING</div>
+              <div className="now-playing-track">
+                <span className="np-artist">{track.artist?.toUpperCase()}</span>
+                <span className="np-sep"> · </span>
+                <span className="np-album">{track.album?.toUpperCase()}</span>
+              </div>
+              <div className="now-playing-title">{track.title}</div>
             </div>
-            <div className="now-playing-title">{track.title}</div>
-          </>
+          </div>
         ) : (
           <div className="now-playing-label dim">no track selected</div>
         )}

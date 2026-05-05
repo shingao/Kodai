@@ -13,7 +13,7 @@ export default function EmptyState({ onScan }) {
     <div className="empty-state">
       <pre className="empty-art">{`
  ╔═══════════════════════╗
- ║   S O N I C _ O S    ║
+ ║   N E I R O _ O S    ║
  ║   ─────────────────   ║
  ║   no tracks found.    ║
  ╚═══════════════════════╝`}

@@ -20,6 +20,21 @@
   padding-right: 14px;
 }
 
+.player-info-inner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.player-info-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
 .now-playing-label {
   font-size: 9px;
   letter-spacing: 0.2em;

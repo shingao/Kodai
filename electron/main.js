@@ -6,6 +6,7 @@ const os = require('os')
 const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged
 
 let mainWindow
+const coverCache = new Map()
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -54,13 +55,13 @@ app.on('activate', () => {
 
 // ── helpers ────────────────────────────────────────────────────────────────
 function playlistsDir() {
-  const dir = path.join(os.homedir(), 'Music', 'SONIC_OS', 'playlists')
+  const dir = path.join(os.homedir(), 'Music', 'NEIRO_OS', 'playlists')
   fs.mkdirSync(dir, { recursive: true })
   return dir
 }
 
 function dataFile() {
-  const dir = path.join(os.homedir(), '.config', 'sonic-os')
+  const dir = path.join(os.homedir(), '.config', 'neiro-os')
   fs.mkdirSync(dir, { recursive: true })
   return path.join(dir, 'data.json')
 }
@@ -95,9 +96,13 @@ ipcMain.handle('scan-dirs', async (event, dirs) => {
       } else if (EXTENSIONS.has(path.extname(entry.name).toLowerCase())) {
         try {
           const stat = fs.statSync(full)
-          const meta = await parseFile(full, { duration: true, skipCovers: true })
+          const meta = await parseFile(full, { duration: true })
           const { common, format } = meta
           const id = Buffer.from(full).toString('base64')
+          const pic = common.picture?.[0]
+          if (pic) {
+            coverCache.set(id, `data:${pic.format};base64,${Buffer.from(pic.data).toString('base64')}`)
+          }
           tracks.push({
             id,
             path: full,
@@ -110,6 +115,7 @@ ipcMain.handle('scan-dirs', async (event, dirs) => {
             addedAt: stat.mtimeMs,
             playCount: 0,
             tags: data.tags?.[id] || [],
+            hasCover: !!pic,
           })
         } catch { /* skip */ }
       }
@@ -309,7 +315,7 @@ ipcMain.handle('bpm-save', (_, { trackId, bpm }) => {
 
 // ── IPC: crates ────────────────────────────────────────────────────────────
 function cratesDir() {
-  const dir = path.join(os.homedir(), 'Music', 'SONIC_OS', 'crates')
+  const dir = path.join(os.homedir(), 'Music', 'NEIRO_OS', 'crates')
   fs.mkdirSync(dir, { recursive: true })
   return dir
 }
@@ -366,7 +372,7 @@ ipcMain.handle('crate-export', async (_, { name, paths }) => {
 
 // ── IPC: session log ───────────────────────────────────────────────────────
 function sessionLogFile() {
-  const dir = path.join(os.homedir(), '.config', 'sonic-os')
+  const dir = path.join(os.homedir(), '.config', 'neiro-os')
   fs.mkdirSync(dir, { recursive: true })
   return path.join(dir, 'sessions.log')
 }
@@ -406,7 +412,7 @@ ipcMain.handle('log-clear', () => {
 
 // ── IPC: changelog ─────────────────────────────────────────────────────────
 function changelogFile() {
-  const dir = path.join(os.homedir(), '.config', 'sonic-os')
+  const dir = path.join(os.homedir(), '.config', 'neiro-os')
   fs.mkdirSync(dir, { recursive: true })
   return path.join(dir, 'changelog.log')
 }
@@ -446,10 +452,14 @@ ipcMain.handle('watch-start', async (_, dirs) => {
     if (!EXTENSIONS.has(path.extname(filePath).toLowerCase())) return
     try {
       const stat = fs.statSync(filePath)
-      const meta = await parseFile(filePath, { duration: true, skipCovers: true })
+      const meta = await parseFile(filePath, { duration: true })
       const { common, format } = meta
       const data = loadData()
       const id = Buffer.from(filePath).toString('base64')
+      const pic = common.picture?.[0]
+      if (pic) {
+        coverCache.set(id, `data:${pic.format};base64,${Buffer.from(pic.data).toString('base64')}`)
+      }
       const track = {
         id,
         path: filePath,
@@ -462,6 +472,7 @@ ipcMain.handle('watch-start', async (_, dirs) => {
         addedAt: stat.mtimeMs,
         playCount: 0,
         tags: data.tags?.[id] || [],
+        hasCover: !!pic,
       }
       appendChangelog('+', filePath)
       mainWindow?.webContents.send('track-added', track)
@@ -474,3 +485,6 @@ ipcMain.handle('watch-start', async (_, dirs) => {
     mainWindow?.webContents.send('track-removed', filePath)
   })
 })
+
+// ── IPC: cover art ─────────────────────────────────────────────────────────
+ipcMain.handle('get-cover', (_, trackId) => coverCache.get(trackId) || null)
