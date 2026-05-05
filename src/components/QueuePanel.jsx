@@ -29,7 +29,7 @@ export default function QueuePanel({ style, queue, onRemove, onClear, onReorder,
   return (
     <div className={`queue-panel ${visible ? 'open' : 'closed'}`} style={visible ? style : undefined}>
       <div className="queue-header">
-        <span className="queue-title">QUEUE</span>
+        <span className="queue-title"></span>
         <span className="queue-count">{queue.length > 0 ? `${queue.length} tracks` : 'empty'}</span>
         <div className="queue-hdr-actions">
           {queue.length > 0 && (

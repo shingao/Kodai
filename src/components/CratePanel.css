@@ -2,20 +2,13 @@
   display: flex;
   flex-direction: column;
   gap: 0;
-  margin-top: 4px;
 }
 
-.cr-header {
+.cr-actions-row {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 4px 12px;
-}
-
-.cr-title {
-  font-size: 10px;
-  color: var(--text-dimmer);
-  letter-spacing: 0.1em;
+  justify-content: flex-end;
+  gap: 4px;
+  padding: 4px 10px;
 }
 
 .cr-btn {
@@ -51,7 +44,7 @@
   border: none;
   outline: none;
   font-family: var(--font);
-  caret-color: var(--text);
+  caret-color: var(--hi-500);
 }
 
 .cr-list {
@@ -87,6 +80,16 @@
   color: var(--text);
 }
 
+.cr-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--hi-500);
+}
+
 .cr-item.drag-over {
   background: var(--bg-selected);
   outline: 1px dashed var(--border-light);
@@ -97,6 +100,11 @@
   color: var(--text-dimmer);
   flex-shrink: 0;
   width: 14px;
+}
+
+.cr-item.active .cr-indicator,
+.cr-item.active .cr-code {
+  color: var(--hi-500);
 }
 
 .cr-code {

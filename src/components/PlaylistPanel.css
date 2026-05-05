@@ -2,25 +2,13 @@
   display: flex;
   flex-direction: column;
   gap: 0;
-  margin-top: 4px;
 }
 
-.pl-header {
+.pl-actions-row {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 4px 12px;
-}
-
-.pl-title {
-  font-size: 10px;
-  color: var(--text-dimmer);
-  letter-spacing: 0.1em;
-}
-
-.pl-actions {
-  display: flex;
+  justify-content: flex-end;
   gap: 4px;
+  padding: 4px 10px;
 }
 
 .pl-btn {
@@ -56,7 +44,7 @@
   border: none;
   outline: none;
   font-family: var(--font);
-  caret-color: var(--text);
+  caret-color: var(--hi-500);
 }
 
 .pl-list {
@@ -90,6 +78,20 @@
 .pl-item.active {
   background: var(--bg-selected);
   color: var(--text);
+}
+
+.pl-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--hi-500);
+}
+
+.pl-item.active .pl-indicator {
+  color: var(--hi-500);
 }
 
 .pl-indicator {

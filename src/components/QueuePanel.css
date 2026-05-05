@@ -35,6 +35,10 @@
   overflow: hidden;
 }
 
+.queue-title::before {
+  content: '—— QUEUE';
+}
+
 .queue-panel.closed .queue-title,
 .queue-panel.closed .queue-count,
 .queue-panel.closed .q-btn:not(.q-toggle) {
@@ -98,6 +102,7 @@
   border-bottom: 1px solid transparent;
   cursor: grab;
   font-size: 11px;
+  position: relative;
 }
 
 .queue-item:hover {
@@ -107,6 +112,20 @@
 
 .queue-item:active {
   cursor: grabbing;
+}
+
+.queue-item.now::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--hi-500);
+}
+
+.queue-item.now .q-num {
+  color: var(--hi-500);
 }
 
 .q-num {

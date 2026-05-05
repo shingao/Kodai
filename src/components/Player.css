@@ -3,10 +3,11 @@
   align-items: stretch;
   gap: 16px;
   padding: 8px 14px;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--rule-hi, var(--border));
   background: var(--bg-elevated);
   min-height: 80px;
   flex-shrink: 0;
+  position: relative;
 }
 
 .player-info {
@@ -59,6 +60,10 @@
   color: var(--text-dimmer);
 }
 
+.np-album {
+  color: var(--hi-500);
+}
+
 .now-playing-title {
   font-size: 13px;
   color: var(--text);
@@ -67,6 +72,14 @@
   overflow: hidden;
   text-overflow: ellipsis;
   letter-spacing: 0.02em;
+}
+
+.now-playing-codestrip {
+  display: flex;
+  gap: 8px;
+  font-size: 9px;
+  color: var(--text-dimmer);
+  letter-spacing: 0.08em;
 }
 
 .player-center {
@@ -90,6 +103,7 @@
   min-width: 36px;
   white-space: nowrap;
   flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
 }
 
 .time-label:last-child {
@@ -125,6 +139,11 @@
   padding: 3px 10px;
   min-width: 72px;
   text-align: center;
+}
+
+.play-btn.is-playing {
+  color: var(--hi-500);
+  border-color: var(--hi-500);
 }
 
 .vol-control {

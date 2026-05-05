@@ -20,8 +20,13 @@
   border-radius: 2px;
 }
 .focus-play:hover {
-  color: var(--accent);
-  border-color: var(--border-light);
+  color: var(--hi-500);
+  border-color: var(--hi-500);
+}
+
+.focus-play.is-playing {
+  color: var(--hi-500);
+  border-color: var(--hi-500);
 }
 
 .focus-info {

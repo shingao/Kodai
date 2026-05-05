@@ -15,16 +15,19 @@ const VIEWS = [
 export default function Sidebar({ style, activeView, setActiveView, currentPlaylist, onPlaylistSelect, onPlaylistPlay, tracks, onPlaylistsChange, crates, currentCrate, onCrateSelect, onCratesChange }) {
   return (
     <nav className="sidebar" style={style}>
+      <span className="sidebar-vlabel">SECTOR · NAV-01</span>
+      <div className="sidebar-rule">VIEWS</div>
       {VIEWS.map((v) => (
         <button
           key={v.id}
           className={`sidebar-item ${activeView === v.id ? 'active' : ''}`}
           onClick={() => setActiveView(v.id)}
         >
-          {activeView === v.id ? '> ' : '  '}{v.label}
+          <span className="sb-arr">{activeView === v.id ? '▸ ' : '  '}</span>
+          {v.label}
         </button>
       ))}
-      <div className="sidebar-divider">──────</div>
+      <div className="sidebar-rule">PLAYLISTS</div>
       <PlaylistPanel
         tracks={tracks}
         currentPlaylist={currentPlaylist}
@@ -32,7 +35,7 @@ export default function Sidebar({ style, activeView, setActiveView, currentPlayl
         onPlay={onPlaylistPlay}
         onChanged={onPlaylistsChange}
       />
-      <div className="sidebar-divider">──────</div>
+      <div className="sidebar-rule">CRATES</div>
       <CratePanel
         crates={crates || []}
         currentCrate={currentCrate}

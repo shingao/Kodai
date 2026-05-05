@@ -13,13 +13,15 @@ export default function Header({ trackCount, totalDuration, scanning, newTrackFl
 
   return (
     <header className="header" style={{ WebkitAppRegion: 'drag' }}>
+      <span className="reg-tick tl" />
       <div className="header-title">
-        <span className="header-logo">NEIRO_OS</span>
-        <span className="header-version">v1.0</span>
+        <span className="header-kanji jp">古代</span>
+        <span className="header-mark">KODAI</span>
+        <span className="header-version">v1.1</span>
         {newTrackFlash ? (
           <span className="header-meta scanning">· {newTrackFlash}</span>
         ) : scanning ? (
-          <span className="header-meta scanning">· scanning...</span>
+          <span className="header-meta scanning">· scanning<span className="dot live">●</span></span>
         ) : currentPlaylist ? (
           <span className="header-meta">
             · playlist: <span className="header-playlist">{currentPlaylist}</span>
@@ -32,8 +34,8 @@ export default function Header({ trackCount, totalDuration, scanning, newTrackFl
         )}
       </div>
       <div className="header-controls" style={{ WebkitAppRegion: 'no-drag' }}>
-        <button className="hbtn" onClick={onRescan} title="Rescan [S]">[S]</button>
-        <button className="hbtn" onClick={onFocus} title="Focus mode [F]">[F]</button>
+        <button className="hbtn" onClick={onRescan} title="Rescan [S]">[S] RESCAN</button>
+        <button className="hbtn" onClick={onFocus} title="Focus mode [F]">[F] FOCUS</button>
         {api && (
           <>
             <button className="hbtn win-btn" onClick={() => api.windowMinimize()}>─</button>

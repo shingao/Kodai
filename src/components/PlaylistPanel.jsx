@@ -64,7 +64,6 @@ export default function PlaylistPanel({ tracks, currentPlaylist, onSelect, onPla
 
   const handleSelect = async (pl) => {
     if (pl.smart && api) {
-      // re-evaluate rules on click
       const resolved = await api.smartPlaylistEval({
         rules: pl.rules,
         limit: pl.limit,
@@ -91,13 +90,10 @@ export default function PlaylistPanel({ tracks, currentPlaylist, onSelect, onPla
 
   return (
     <div className="playlist-panel">
-      <div className="pl-header">
-        <span className="pl-title">PLAYLISTS</span>
-        <div className="pl-actions">
-          <button className="pl-btn" onClick={() => setCreating(true)} title="New playlist">+</button>
-          <button className="pl-btn" onClick={() => setSmartDialog(true)} title="New smart playlist">[★]</button>
-          <button className="pl-btn" onClick={importPl} title="Import .m3u">↓</button>
-        </div>
+      <div className="pl-actions-row">
+        <button className="pl-btn" onClick={() => setCreating(true)} title="New playlist">+</button>
+        <button className="pl-btn" onClick={() => setSmartDialog(true)} title="New smart playlist">[★]</button>
+        <button className="pl-btn" onClick={importPl} title="Import .m3u">↓</button>
       </div>
 
       {smartDialog && (

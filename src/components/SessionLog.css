@@ -20,6 +20,10 @@
   letter-spacing: 0.12em;
 }
 
+.log-title::before {
+  content: '—— ';
+}
+
 .log-actions {
   display: flex;
   gap: 4px;

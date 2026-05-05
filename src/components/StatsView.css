@@ -20,6 +20,18 @@
   margin-bottom: 4px;
   padding-bottom: 4px;
   border-bottom: 1px solid var(--border);
+  padding-left: 8px;
+}
+
+.stats-label::before {
+  content: '';
+  display: inline-block;
+  width: 2px;
+  height: 10px;
+  background: var(--hi-500);
+  margin-right: 8px;
+  margin-left: -8px;
+  vertical-align: middle;
 }
 
 .stats-row {
@@ -43,7 +55,7 @@
 
 .sparkline {
   font-size: 14px;
-  color: var(--text-dim);
+  color: var(--hi-500);
   letter-spacing: 1px;
   white-space: nowrap;
   line-height: 1;
@@ -106,7 +118,7 @@
 
 .stats-bar-fill {
   height: 100%;
-  background: var(--text-dimmer);
+  background: var(--hi-500);
   border-radius: 2px;
   transition: width 0.3s ease;
 }

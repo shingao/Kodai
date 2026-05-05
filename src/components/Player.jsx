@@ -18,18 +18,25 @@ function volBars(vol) {
 export default function Player({ track, isPlaying, progress, duration, volume, shuffleOn, onPlayPause, onNext, onPrev, onSeek, onVolume, onShuffle, analyser }) {
   return (
     <footer className="player">
+      <span className="reg-tick tl" />
+      <span className="reg-tick br" />
       <div className="player-info">
         {track ? (
           <div className="player-info-inner">
             <AlbumArt trackId={track.id} hasCover={track.hasCover} size={32} />
             <div className="player-info-text">
-              <div className="now-playing-label">NOW PLAYING</div>
+              <div className="now-playing-label">— NOW PLAYING · CH-01</div>
               <div className="now-playing-track">
                 <span className="np-artist">{track.artist?.toUpperCase()}</span>
                 <span className="np-sep"> · </span>
                 <span className="np-album">{track.album?.toUpperCase()}</span>
               </div>
               <div className="now-playing-title">{track.title}</div>
+              <div className="now-playing-codestrip">
+                {track.bpm && <span>{Math.round(track.bpm)} BPM</span>}
+                {track.format && <span>{track.format.toUpperCase()}</span>}
+                {track.year && <span>{track.year}</span>}
+              </div>
             </div>
           </div>
         ) : (
@@ -45,7 +52,7 @@ export default function Player({ track, isPlaying, progress, duration, volume, s
         </div>
         <div className="controls-row">
           <button className="ctrl-btn" onClick={onPrev} title="Previous [←]">|◀◀</button>
-          <button className="ctrl-btn play-btn" onClick={onPlayPause} title="Play/Pause [SPACE]">
+          <button className={`ctrl-btn play-btn ${isPlaying ? 'is-playing' : ''}`} onClick={onPlayPause} title="Play/Pause [SPACE]">
             {isPlaying ? '[ ▮▮ ]' : '[ ▶  ]'}
           </button>
           <button className="ctrl-btn" onClick={onNext} title="Next [→]">▶▶|</button>
