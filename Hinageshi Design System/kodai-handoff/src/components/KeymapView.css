@@ -1,0 +1,130 @@
+.keymap-view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.km-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.km-title {
+  font-size: 9px;
+  color: var(--text-dim);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+.km-title::before {
+  content: "—— ";
+  color: var(--text-dimmer);
+}
+
+.km-btn {
+  color: var(--text-dimmer);
+  font-size: 11px;
+  padding: 2px 6px;
+  border: 1px solid var(--border-light);
+  border-radius: 2px;
+}
+.km-btn:hover {
+  color: var(--text);
+  border-color: var(--text-dimmer);
+}
+
+.km-hint {
+  padding: 6px 14px 4px;
+  font-size: 10px;
+  color: var(--text-dimmer);
+  font-style: italic;
+}
+
+.km-table {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+
+.km-row {
+  display: flex;
+  align-items: center;
+  padding: 6px 14px;
+  gap: 12px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+}
+
+.km-head {
+  cursor: default;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 5px;
+  margin-bottom: 2px;
+}
+
+.km-row:not(.km-head):hover {
+  background: var(--bg-hover);
+  border-bottom-color: var(--border);
+}
+
+.km-row.km-capturing {
+  background: var(--bg-selected);
+  border-bottom-color: var(--border-light);
+  position: relative;
+}
+.km-row.km-capturing::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 2px;
+  background: var(--hi-500);
+}
+.km-capturing .km-col-key {
+  color: var(--hi-500) !important;
+  font-style: italic;
+}
+
+.km-col-action {
+  flex: 1;
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.km-head .km-col-action {
+  font-size: 10px;
+  color: var(--text-dimmer);
+  letter-spacing: 0.08em;
+}
+
+.km-col-key {
+  width: 160px;
+  font-size: 12px;
+  color: var(--text);
+  font-family: var(--font);
+}
+
+.km-head .km-col-key {
+  font-size: 10px;
+  color: var(--text-dimmer);
+  letter-spacing: 0.08em;
+}
+
+.km-col-default {
+  width: 120px;
+  font-size: 11px;
+  color: var(--text-dimmer);
+}
+
+.km-head .km-col-default {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
+
+.km-capturing .km-col-key {
+  color: var(--text-dimmer);
+  font-style: italic;
+}

@@ -1,0 +1,32 @@
+/* ───────────────────────────────────────────────────────────────
+   theme.css — signal-color presets
+
+   Hinageshi (緋芥子) red is the brand default. Switch via:
+     <html data-theme="cyan">  // or amber, lime
+   in index.html, or by setting data-theme on the root at runtime.
+   ───────────────────────────────────────────────────────────── */
+
+:root[data-theme="red"],
+:root:not([data-theme]) {
+  --hi-500: #D9382A;
+  --hi-700: #9E2218;
+  --hi-glow: rgba(217, 56, 42, 0.55);
+}
+
+:root[data-theme="cyan"] {
+  --hi-500: #4ECDC4;
+  --hi-700: #2A8F87;
+  --hi-glow: rgba(78, 205, 196, 0.55);
+}
+
+:root[data-theme="amber"] {
+  --hi-500: #E8A33D;
+  --hi-700: #A56F1F;
+  --hi-glow: rgba(232, 163, 61, 0.55);
+}
+
+:root[data-theme="lime"] {
+  --hi-500: #B8E040;
+  --hi-700: #7AA01E;
+  --hi-glow: rgba(184, 224, 64, 0.55);
+}

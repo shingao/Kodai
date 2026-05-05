@@ -1,0 +1,183 @@
+.queue-panel {
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid var(--border);
+  background: var(--bg);
+  transition: width 0.15s ease;
+  flex-shrink: 0;
+}
+
+.queue-panel.open {
+  width: 200px;
+  min-width: 120px;
+}
+
+.queue-panel.closed {
+  width: 28px;
+  min-width: 28px;
+}
+
+.queue-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border);
+  min-height: 30px;
+  flex-shrink: 0;
+}
+
+.queue-title {
+  font-size: 9px;
+  color: var(--text-dim);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.queue-title::before {
+  content: "—— ";
+  color: var(--text-dimmer);
+}
+
+.queue-panel.closed .queue-title,
+.queue-panel.closed .queue-count,
+.queue-panel.closed .q-btn:not(.q-toggle) {
+  display: none;
+}
+
+.queue-count {
+  font-size: 9px;
+  color: var(--text-dimmer);
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.queue-hdr-actions {
+  display: flex;
+  gap: 2px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.q-btn {
+  color: var(--text-dimmer);
+  font-size: 11px;
+  padding: 1px 4px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+}
+.q-btn:hover {
+  color: var(--text);
+  border-color: var(--border-light);
+}
+
+.queue-body {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.queue-empty {
+  padding: 16px 10px;
+  color: var(--text-dimmer);
+  font-size: 11px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.queue-hint {
+  font-size: 10px;
+  color: var(--text-dimmer);
+  opacity: 0.6;
+}
+
+.queue-item {
+  display: flex;
+  align-items: center;
+  padding: 6px 10px;
+  gap: 6px;
+  border-bottom: 1px solid #161616;
+  cursor: grab;
+  font-size: 11px;
+  position: relative;
+}
+
+.queue-item:hover {
+  background: var(--bg-hover);
+}
+
+.queue-item.now {
+  background: var(--bg-selected);
+}
+.queue-item.now::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 2px;
+  background: var(--hi-500);
+}
+.queue-item.now .q-num {
+  color: var(--hi-500);
+}
+
+.queue-item:active {
+  cursor: grabbing;
+}
+
+.q-num {
+  color: var(--text-dimmer);
+  font-size: 10px;
+  flex-shrink: 0;
+  width: 18px;
+}
+
+.q-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.q-title {
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+}
+
+.q-artist {
+  color: var(--text-dimmer);
+  font-size: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.q-dur {
+  color: var(--text-dimmer);
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
+.q-remove {
+  color: var(--text-dimmer);
+  font-size: 10px;
+  opacity: 0;
+  padding: 1px 3px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+}
+
+.queue-item:hover .q-remove {
+  opacity: 1;
+}
+
+.q-remove:hover {
+  color: var(--text);
+  border-color: var(--border-light);
+}

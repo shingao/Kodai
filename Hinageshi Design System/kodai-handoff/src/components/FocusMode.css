@@ -1,0 +1,65 @@
+.focus-bar {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+  background: var(--bg-elevated);
+  border-top: 1px solid var(--border);
+  font-size: 11px;
+  overflow: hidden;
+}
+
+.focus-play {
+  color: var(--text);
+  font-size: 12px;
+  padding: 0 6px;
+  flex-shrink: 0;
+  border: 1px solid transparent;
+  border-radius: 2px;
+}
+.focus-play:hover {
+  color: var(--hi-500);
+  border-color: var(--hi-700);
+}
+.focus-play.is-playing {
+  color: var(--hi-500);
+}
+
+.focus-info {
+  color: var(--text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+}
+
+.focus-progress {
+  color: var(--text-dimmer);
+  letter-spacing: -1px;
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
+.focus-time {
+  color: var(--text-dimmer);
+  font-size: 10px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.focus-exit {
+  color: var(--text-dimmer);
+  font-size: 12px;
+  margin-left: 4px;
+  padding: 2px 6px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.focus-exit:hover {
+  color: var(--text);
+  border-color: var(--border-light);
+}
